@@ -66,6 +66,9 @@
 </style>
 </head>
 <body class="font-sans antialiased text-midnight_text dark:text-white dark:bg-darkmode overflow-x-hidden w-full relative">
+<script>
+(function(){const s=localStorage.getItem('tanipantau-dark-mode');const h=document.documentElement;if(s==='true'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches)){h.classList.add('dark')}else{h.classList.remove('dark')}})();
+</script>
 <!-- TopNavBar -->
 <header class="fixed top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-border dark:bg-darkmode/90 dark:border-gray/30 transition-all shadow-sm">
     <div class="container mx-auto lg:max-w-screen-xl md:max-w-screen-md flex items-center justify-between px-4 py-6 transition-all duration-300">
@@ -79,6 +82,10 @@
             <a href="/public/artikel" class="text-midnight_text dark:text-white hover:text-primary transition-colors">Artikel</a>
         </nav>
         <div class="flex items-center space-x-4">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray dark:text-white/70" title="Toggle Dark Mode">
+                <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+            </button>
             <a class="hidden lg:block bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary_hover transition duration-300 font-semibold" href="/login">Login</a>
         </div>
     </div>
@@ -542,6 +549,13 @@
 <!-- AOS Animation Script -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+        const html = document.documentElement;
+        html.classList.toggle('dark');
+        localStorage.setItem('tanipantau-dark-mode', html.classList.contains('dark'));
+    }
+
     // Initialize AOS
     AOS.init({
         once: true,

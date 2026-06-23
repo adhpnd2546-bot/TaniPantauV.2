@@ -1,6 +1,17 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 <head>
+    <script>
+    (function(){
+        var s=localStorage.getItem('tanipantau-dark-mode');
+        var h=document.documentElement;
+        if(s==='true'||(!s&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
+            h.classList.add('dark');
+        } else {
+            h.classList.remove('dark');
+        }
+    })();
+    </script>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Login - TaniPantau</title>
@@ -54,10 +65,12 @@
             font-weight: 600 !important;
             font-size: 14px !important;
         }
+        .dark .swal2-popup { background: #1e293b !important; border-color: #334155 !important; }
+        .dark .swal2-title { color: #f1f5f9 !important; }
     </style>
 </head>
 
-<body class="font-sans antialiased text-midnight_text min-h-screen flex">
+<body class="font-sans antialiased text-midnight_text dark:text-white dark:bg-darkmode min-h-screen flex">
     
     <!-- Left Panel: Graphic & Context (Immersive Floating UI over Majestic Landscape) -->
     <div class="hidden lg:flex lg:w-7/12 relative overflow-hidden items-center justify-center p-12">
@@ -66,8 +79,8 @@
         <div class="absolute inset-0 bg-cover bg-center transform scale-105" style="background-image: url('{{ asset('images/fresh-sawah.png') }}');"></div>
         
         <!-- Deep Elegant Overlay -->
-        <div class="absolute inset-0 bg-emerald-950/40 mix-blend-multiply"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-900/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-emerald-950/40 dark:bg-black/60 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-900/40 to-transparent dark:from-black/90"></div>
 
         <!-- Main Typography (Center/Bottom Left Aligned) -->
         <div class="relative z-10 w-full max-w-2xl mt-auto pb-12">
@@ -136,27 +149,35 @@
     </div>
 
     <!-- Right Panel: Login Form Area (Ultra Clean & Aesthetic) -->
-    <div class="w-full lg:w-5/12 bg-white flex flex-col justify-center px-8 py-12 sm:px-16 lg:px-24 relative overflow-y-auto z-20">
+    <div class="w-full lg:w-5/12 bg-white dark:bg-darkmode flex flex-col justify-center px-8 py-12 sm:px-16 lg:px-24 relative overflow-y-auto z-20">
         
         <div class="w-full max-w-[360px] mx-auto">
             <!-- Back Link -->
-            <a class="inline-flex items-center gap-2 text-[13px] font-medium text-gray-400 hover:text-gray-900 transition-colors mb-12" href="/">
+            <a class="inline-flex items-center gap-2 text-[13px] font-medium text-gray-400 dark:text-dark-muted hover:text-gray-900 dark:hover:text-dark-heading transition-colors mb-12" href="/">
                 <span class="material-symbols-outlined text-[16px]">arrow_back</span>
                 Kembali
             </a>
             
+            <!-- Dark Mode Toggle (top right) -->
+            <div class="absolute top-6 right-6">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-gray dark:text-white/70" title="Toggle Dark Mode">
+                    <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+                </button>
+            </div>
+            
             <!-- Mobile Logo -->
             <div class="flex lg:hidden items-center gap-2 mb-10">
-                <div class="w-8 h-8 rounded bg-emerald-500/10 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-emerald-600 text-[18px]" style="font-variation-settings: 'FILL' 1;">grass</span>
+                <div class="w-8 h-8 rounded bg-emerald-500/10 dark:bg-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-emerald-600 dark:text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">grass</span>
                 </div>
-                <span class="font-medium text-lg tracking-tight text-gray-900">TaniPantau</span>
+                <span class="font-medium text-lg tracking-tight text-gray-900 dark:text-dark-heading">TaniPantau</span>
             </div>
             
             <!-- Form Header -->
             <div class="mb-8">
-                <h2 class="text-[28px] font-semibold tracking-tight text-gray-900 mb-2">Masuk ke akun Anda</h2>
-                <p class="text-[15px] text-gray-500">Masukkan detail Anda di bawah ini untuk melanjutkan.</p>
+                <h2 class="text-[28px] font-semibold tracking-tight text-gray-900 dark:text-dark-heading mb-2">Masuk ke akun Anda</h2>
+                <p class="text-[15px] text-gray-500 dark:text-dark-body">Masukkan detail Anda di bawah ini untuk melanjutkan.</p>
             </div>
             
             <!-- Login Form -->
@@ -164,20 +185,20 @@
                 @csrf
                 <!-- Input: Email/Username -->
                 <div class="space-y-2">
-                    <label class="block text-[13px] font-medium text-gray-700" for="email">Email</label>
-                    <input class="block w-full px-4 py-2.5 bg-transparent border border-gray-200 rounded-lg text-[15px] text-gray-900 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('email') border-red-500 @enderror" id="email" name="email" placeholder="nama@perusahaan.com" required="" type="email" />
+                    <label class="block text-[13px] font-medium text-gray-700 dark:text-dark-body" for="email">Email</label>
+                    <input class="block w-full px-4 py-2.5 bg-transparent border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-gray-900 dark:text-dark-heading placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-dark-card focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('email') border-red-500 @enderror" id="email" name="email" placeholder="nama@perusahaan.com" required="" type="email" />
                     @error('email') <p class="text-[13px] text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 
                 <!-- Input: Password -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
-                        <label class="block text-[13px] font-medium text-gray-700" for="password">Kata Sandi</label>
-                        <a class="text-[13px] text-gray-500 hover:text-gray-900 transition-colors" href="{{ route('password.request') }}">Lupa sandi?</a>
+                        <label class="block text-[13px] font-medium text-gray-700 dark:text-dark-body" for="password">Kata Sandi</label>
+                        <a class="text-[13px] text-gray-500 dark:text-dark-muted hover:text-gray-900 dark:hover:text-dark-heading transition-colors" href="{{ route('password.request') }}">Lupa sandi?</a>
                     </div>
                     <div class="relative">
-                        <input class="block w-full px-4 py-2.5 pr-10 bg-transparent border border-gray-200 rounded-lg text-[15px] text-gray-900 placeholder-gray-400 focus:bg-white focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('password') border-red-500 @enderror" id="password" name="password" placeholder="••••••••" required="" type="password" />
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors">
+                        <input class="block w-full px-4 py-2.5 pr-10 bg-transparent border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-gray-900 dark:text-dark-heading placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-dark-card focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('password') border-red-500 @enderror" id="password" name="password" placeholder="••••••••" required="" type="password" />
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-muted hover:text-gray-700 dark:hover:text-dark-heading transition-colors">
                             <span id="eyeIcon" class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
                         @error('password') <p class="text-[13px] text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -192,11 +213,11 @@
             
             <!-- Demo Accounts Section -->
             <div class="mt-10 text-center">
-                <p class="text-[13px] text-gray-500 mb-2">Demo</p>
+                <p class="text-[13px] text-gray-500 dark:text-dark-muted mb-2">Demo</p>
                 <div class="flex items-center justify-center gap-3 text-[13px] font-medium">
-                    <button onclick="loginAs('admin')" class="text-gray-700 underline underline-offset-2 hover:text-emerald-600 transition-colors" type="button">Admin</button>
-                    <span class="text-gray-300">|</span>
-                    <button onclick="loginAs('petugas')" class="text-gray-700 underline underline-offset-2 hover:text-emerald-600 transition-colors" type="button">Petugas</button>
+                    <button onclick="loginAs('admin')" class="text-gray-700 dark:text-dark-body underline underline-offset-2 hover:text-emerald-600 dark:hover:text-primary transition-colors" type="button">Admin</button>
+                    <span class="text-gray-300 dark:text-dark-border">|</span>
+                    <button onclick="loginAs('petugas')" class="text-gray-700 dark:text-dark-body underline underline-offset-2 hover:text-emerald-600 dark:hover:text-primary transition-colors" type="button">Petugas</button>
 
                 </div>
             </div>
@@ -204,6 +225,11 @@
     </div>
 
     <script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('tanipantau-dark-mode', html.classList.contains('dark'));
+        }
         function togglePassword() {
             const p = document.getElementById('password');
             const e = document.getElementById('eyeIcon');

@@ -17,7 +17,7 @@
                         </p>
                         <div>
                             <a href="{{ route('admin.lahan.index') }}"
-                                class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">Lihat
+                                class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white dark:bg-dark-card text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">Lihat
                                 Lahan</a>
                         </div>
                     </div>
@@ -32,11 +32,11 @@
 
         <div class="md:col-span-12 lg:col-span-4">
             <div
-                class="bg-white rounded-[0.5rem] shadow-card p-6 h-full flex flex-col justify-between relative overflow-hidden">
+                class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-6 h-full flex flex-col justify-between relative overflow-hidden">
                 <div class="flex justify-between items-start relative z-10">
                     <div>
-                        <h6 class="text-[14px] font-semibold text-heading mb-1">Ringkasan Data</h6>
-                        <p class="text-[12px] text-muted">TaniPantau Dashboard</p>
+                        <h6 class="text-[14px] font-semibold text-heading dark:text-dark-heading mb-1">Ringkasan Data</h6>
+                        <p class="text-[12px] text-muted dark:text-dark-muted">TaniPantau Dashboard</p>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <span class="material-symbols-outlined text-primary text-[24px]"
@@ -44,8 +44,8 @@
                     </div>
                 </div>
                 <div class="mt-4 relative z-10">
-                    <h3 class="text-[2.25rem] font-bold text-heading m-0 leading-tight">{{ $totalKunjungan }}</h3>
-                    <p class="text-[13px] font-medium text-body mt-1">Total Kunjungan Tercatat</p>
+                    <h3 class="text-[2.25rem] font-bold text-heading dark:text-dark-heading m-0 leading-tight">{{ $totalKunjungan }}</h3>
+                    <p class="text-[13px] font-medium text-body dark:text-dark-body mt-1">Total Kunjungan Tercatat</p>
                 </div>
             </div>
         </div>
@@ -53,53 +53,53 @@
 
     <!-- Row 2: 4 Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 rounded-[0.375rem] bg-success/10 text-success flex items-center justify-center">
                     <span class="material-symbols-outlined text-[22px]">groups</span>
                 </div>
             </div>
-            <span class="block text-[13px] font-medium text-heading mb-1">Total Petani</span>
-            <h3 class="text-[1.5rem] font-semibold text-heading m-0">{{ $totalPetani }}</h3>
+            <span class="block text-[13px] font-medium text-heading dark:text-dark-heading mb-1">Total Petani</span>
+            <h3 class="text-[1.5rem] font-semibold text-heading dark:text-dark-heading m-0">{{ $totalPetani }}</h3>
                 <small class="text-success font-medium flex items-center gap-1 mt-1">
                 <span class="material-symbols-outlined text-[14px]">circle</span> Terdaftar
             </small>
         </div>
 
-        <div class="bg-white rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 rounded-[0.375rem] bg-info/10 text-info flex items-center justify-center">
                     <span class="material-symbols-outlined text-[22px]">landscape</span>
                 </div>
             </div>
-            <span class="block text-[13px] font-medium text-heading mb-1">Total Lahan</span>
-            <h3 class="text-[1.5rem] font-semibold text-heading m-0">{{ $totalLahan }}</h3>
+            <span class="block text-[13px] font-medium text-heading dark:text-dark-heading mb-1">Total Lahan</span>
+            <h3 class="text-[1.5rem] font-semibold text-heading dark:text-dark-heading m-0">{{ $totalLahan }}</h3>
             <small class="text-info font-medium flex items-center gap-1 mt-1">
                 <span class="material-symbols-outlined text-[14px]">circle</span> Tercatat
             </small>
         </div>
 
-        <div class="bg-white rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 rounded-[0.375rem] bg-primary/10 text-primary flex items-center justify-center">
                     <span class="material-symbols-outlined text-[22px]">assignment</span>
                 </div>
             </div>
-            <span class="block text-[13px] font-medium text-heading mb-1">Total Kunjungan</span>
-            <h3 class="text-[1.5rem] font-semibold text-heading m-0">{{ $totalKunjungan }}</h3>
+            <span class="block text-[13px] font-medium text-heading dark:text-dark-heading mb-1">Total Kunjungan</span>
+            <h3 class="text-[1.5rem] font-semibold text-heading dark:text-dark-heading m-0">{{ $totalKunjungan }}</h3>
             <small class="text-success font-medium flex items-center gap-1 mt-1">
                 <span class="material-symbols-outlined text-[14px]">circle</span> Tercatat
             </small>
         </div>
 
-        <div class="bg-white rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-5 hover:-translate-y-1 transition-transform duration-300">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 rounded-[0.375rem] bg-danger/10 text-danger flex items-center justify-center">
                     <span class="material-symbols-outlined text-[22px]">warning</span>
                 </div>
             </div>
-            <span class="block text-[13px] font-medium text-heading mb-1">Lahan Perlu Tindakan</span>
-            <h3 class="text-[1.5rem] font-semibold text-heading m-0">{{ $lahanPerluTindakan }}</h3>
+            <span class="block text-[13px] font-medium text-heading dark:text-dark-heading mb-1">Lahan Perlu Tindakan</span>
+            <h3 class="text-[1.5rem] font-semibold text-heading dark:text-dark-heading m-0">{{ $lahanPerluTindakan }}</h3>
             <small class="text-danger font-medium flex items-center gap-1 mt-1">
                 <span class="material-symbols-outlined text-[14px]">circle</span> Perlu Perhatian
             </small>
@@ -108,11 +108,11 @@
 
     <!-- Data Table -->
     <div class="mt-6">
-        <div class="bg-white rounded-[0.5rem] shadow-card">
-            <div class="px-6 py-5 flex items-center justify-between border-b border-border">
-                <h5 class="text-[1.125rem] font-medium text-heading m-0">Lahan Terbaru</h5>
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card">
+            <div class="px-6 py-5 flex items-center justify-between border-b border-border dark:border-dark-border">
+                <h5 class="text-[1.125rem] font-medium text-heading dark:text-dark-heading m-0">Lahan Terbaru</h5>
                 <a href="{{ route('admin.lahan.index') }}"
-                    class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">
+                    class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white dark:bg-dark-card text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">
                     Lihat Lahan
                 </a>
             </div>
@@ -121,30 +121,30 @@
                     <thead>
                         <tr>
                             <th
-                                class="px-6 py-3 border-b border-border bg-[#f9f9f9] text-[12px] font-semibold tracking-wide text-muted uppercase">
+                                class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">
                                 Nama Lahan</th>
                             <th
-                                class="px-6 py-3 border-b border-border bg-[#f9f9f9] text-[12px] font-semibold tracking-wide text-muted uppercase">
+                                class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">
                                 Petani</th>
                             <th
-                                class="px-6 py-3 border-b border-border bg-[#f9f9f9] text-[12px] font-semibold tracking-wide text-muted uppercase">
+                                class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">
                                 Komoditas</th>
                             <th
-                                class="px-6 py-3 border-b border-border bg-[#f9f9f9] text-[12px] font-semibold tracking-wide text-muted uppercase">
+                                class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">
                                 Luas (Ha)</th>
                             <th
-                                class="px-6 py-3 border-b border-border bg-[#f9f9f9] text-[12px] font-semibold tracking-wide text-muted uppercase">
+                                class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">
                                 Fase</th>
                         </tr>
                     </thead>
-                    <tbody class="text-[14px] text-body">
+                    <tbody class="text-[14px] text-body dark:text-dark-body">
                         @forelse($lahanTerbaru as $l)
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-3 border-b border-border font-medium text-heading">{{ $l->nama_lahan }}</td>
-                                <td class="px-6 py-3 border-b border-border">{{ $l->petani->nama_petani ?? '-' }}</td>
-                                <td class="px-6 py-3 border-b border-border">{{ ucfirst($l->komoditas) }}</td>
-                                <td class="px-6 py-3 border-b border-border">{{ number_format($l->luas_lahan, 1) }}</td>
-                                <td class="px-6 py-3 border-b border-border">
+                            <tr class="hover:bg-slate-50 dark:hover:bg-dark-border/20 transition-colors">
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border font-medium text-heading dark:text-dark-heading">{{ $l->nama_lahan }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ $l->petani->nama_petani ?? '-' }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ ucfirst($l->komoditas) }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ number_format($l->luas_lahan, 1) }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">
                                     @php
                                         $faseColors = ['persiapan' => 'bg-secondary/10 text-secondary', 'tanam' => 'bg-info/10 text-info', 'pemeliharaan' => 'bg-warning/10 text-warning', 'panen' => 'bg-success/10 text-success'];
                                         $color = $faseColors[$l->status_fase] ?? 'bg-secondary/10 text-secondary';
@@ -155,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-muted">Belum ada data lahan.</td>
+                                <td colspan="5" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data lahan.</td>
                             </tr>
                         @endforelse
                     </tbody>

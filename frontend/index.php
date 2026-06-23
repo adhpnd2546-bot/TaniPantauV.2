@@ -22,9 +22,9 @@ if (!empty($statsData)) {
     $totalKunjungan = $statsData['total_kunjungan'] ?? 0;
     $lahanPerluTindakan = $statsData['lahan_perlu_tindakan'] ?? 0;
 } else {
-    $petani = apiGet('/petani'); $lahan = apiGet('/lahan'); $kunjungan = apiGet('/kunjungan');
-    $totalPetani = is_array($petani) ? count($petani) : 0;
-    $totalLahan = is_array($lahan) ? count($lahan) : 0;
+    $petani = apiGet('/petani?per_page=1'); $lahan = apiGet('/lahan?per_page=1'); $kunjungan = apiGet('/kunjungan');
+    $totalPetani = is_array($petani) ? (isset($petani['total']) ? $petani['total'] : count($petani)) : 0;
+    $totalLahan = is_array($lahan) ? (isset($lahan['total']) ? $lahan['total'] : count($lahan)) : 0;
     $totalKunjungan = is_array($kunjungan) ? count($kunjungan) : 0;
     $lahanPerluTindakan = 0;
 }
@@ -34,14 +34,18 @@ $filterFase = $_GET['status_fase'] ?? '';
 $filterKecamatan = $_GET['kecamatan'] ?? '';
 $filterBelumDikunjungi = $_GET['belum_dikunjungi'] ?? '';
 
-$apiUrl = '/lahan';
+$apiUrl = '/lahan?per_page=9999';
 $params = [];
 if ($filterKomoditas) $params[] = 'komoditas=' . urlencode($filterKomoditas);
 if ($filterFase) $params[] = 'status_fase=' . urlencode($filterFase);
 if ($filterKecamatan) $params[] = 'kecamatan=' . urlencode($filterKecamatan);
-if (count($params)) $apiUrl .= '?' . implode('&', $params);
+if (count($params)) $apiUrl .= '&' . implode('&', $params);
 
-$allLahan = apiGet($apiUrl);
+$apiResponse = apiGet($apiUrl);
+$allLahan = [];
+if (is_array($apiResponse)) {
+    $allLahan = isset($apiResponse['data']) ? $apiResponse['data'] : $apiResponse;
+}
 if (!is_array($allLahan)) $allLahan = [];
 
 if ($filterBelumDikunjungi === '1') {
@@ -84,8 +88,8 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
 ?>
 <div class="hero-wrap text-white text-center">
     <div class="container">
-        <div class="hero-icon"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1;font-size:36px;">eco</span></div>
-        <h1 class="text-white fw-bold mb-2" style="font-size: 2.75rem;">TaniPantau</h1>
+        <div class="hero-icon"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1;font-size:48px;color:#22c55e;">eco</span></div>
+        <h1 class="text-white fw-bold mb-2" style="font-size: 2.75rem;letter-spacing:-0.03em;">Tani<span style="display:inline-block;background:#22c55e;color:white;padding:2px 12px;border-radius:6px;margin-left:4px;">Pantau</span></h1>
         <p class="text-white/80 mb-5 mx-auto" style="max-width: 520px; font-size: 1.1rem;">Dashboard Monitoring Lahan Pertanian dan Kunjungan Petugas Lapangan</p>
         <a href="#statistik" class="btn btn-light rounded-pill px-5 fw-bold text-primary">
             <i class="bi bi-arrow-down me-2"></i> Lihat Ringkasan
@@ -290,15 +294,26 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
         <nav class="mt-4">
             <ul class="pagination justify-content-center">
                 <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page - 1 ?>&<?= http_build_query(array_merge($_GET, ['page' => ''])) ?>#data-lahan"><i class="bi bi-chevron-left"></i></a>
+                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>#data-lahan"><i class="bi bi-chevron-left"></i></a>
                 </li>
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <?php
+                $rangeStart = max(1, $page - 2);
+                $rangeEnd = min($totalPages, $page + 2);
+                if ($rangeStart > 1): ?>
+                <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>#data-lahan">1</a></li>
+                <?php if ($rangeStart > 2): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $rangeStart; $i <= $rangeEnd; $i++): ?>
                 <li class="page-item <?= $page == $i ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>&<?= http_build_query(array_merge($_GET, ['page' => ''])) ?>#data-lahan"><?= $i ?></a>
+                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>#data-lahan"><?= $i ?></a>
                 </li>
                 <?php endfor; ?>
+                <?php if ($rangeEnd < $totalPages): ?>
+                <?php if ($rangeEnd < $totalPages - 1): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
+                <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $totalPages])) ?>#data-lahan"><?= $totalPages ?></a></li>
+                <?php endif; ?>
                 <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?page=<?= $page + 1 ?>&<?= http_build_query(array_merge($_GET, ['page' => ''])) ?>#data-lahan"><i class="bi bi-chevron-right"></i></a>
+                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>#data-lahan"><i class="bi bi-chevron-right"></i></a>
                 </li>
             </ul>
         </nav>

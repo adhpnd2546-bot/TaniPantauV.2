@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Petani;
-use App\Models\Kecamatan;
+use App\Models\Provinsi;
 use Illuminate\Http\Request;
 
 class PetaniController extends Controller
@@ -17,8 +17,33 @@ class PetaniController extends Controller
 
     public function create()
     {
-        $kecamatan = Kecamatan::with('desa')->get();
-        return view('admin.petani-form', ['petani' => null, 'title' => 'Tambah Petani', 'kecamatan' => $kecamatan]);
+        $data = $this->getWilayahData();
+        return view('admin.petani-form', array_merge($data, [
+            'petani' => null,
+            'title' => 'Tambah Petani',
+        ]));
+    }
+
+    private function getWilayahData(): array
+    {
+        $provinsi = Provinsi::with('kota.kecamatan.desa')->get();
+        $wilayahJson = $provinsi->map(fn($p) => [
+            'id' => (string) $p->id,
+            'nama' => $p->nama,
+            'kota' => $p->kota->map(fn($kab) => [
+                'id' => (string) $kab->id,
+                'nama' => $kab->nama,
+                'kecamatan' => $kab->kecamatan->map(fn($k) => [
+                    'id' => (string) $k->id,
+                    'nama' => $k->nama,
+                    'desa' => $k->desa->map(fn($d) => [
+                        'id' => (string) $d->id,
+                        'nama' => $d->nama,
+                    ]),
+                ]),
+            ]),
+        ]);
+        return compact('provinsi', 'wilayahJson');
     }
 
     public function store(Request $request)
@@ -29,7 +54,7 @@ class PetaniController extends Controller
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
-            'no_hp' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
         ]);
 
         Petani::create($validated);
@@ -40,8 +65,11 @@ class PetaniController extends Controller
     public function edit($id)
     {
         $petani = Petani::with(['kecamatan', 'desa'])->findOrFail($id);
-        $kecamatan = Kecamatan::with('desa')->get();
-        return view('admin.petani-form', ['petani' => $petani, 'title' => 'Edit Petani', 'kecamatan' => $kecamatan]);
+        $data = $this->getWilayahData();
+        return view('admin.petani-form', array_merge($data, [
+            'petani' => $petani,
+            'title' => 'Edit Petani',
+        ]));
     }
 
     public function update(Request $request, $id)
@@ -54,7 +82,7 @@ class PetaniController extends Controller
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
-            'no_hp' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
         ]);
 
         $petani->update($validated);

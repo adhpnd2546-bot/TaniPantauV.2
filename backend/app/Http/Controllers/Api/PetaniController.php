@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Petani;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PetaniController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $petani = Petani::with(['kecamatan', 'desa'])->get()->map(function ($p) {
+        $perPage = $request->input('per_page', 10);
+        $petani = Petani::with(['kecamatan', 'desa'])->paginate($perPage);
+
+        $data = $petani->map(function ($p) {
             return [
                 'id' => $p->id,
                 'nama_petani' => $p->nama_petani,
@@ -24,7 +28,13 @@ class PetaniController extends Controller
             ];
         });
 
-        return response()->json($petani);
+        return response()->json([
+            'data' => $data,
+            'current_page' => $petani->currentPage(),
+            'last_page' => $petani->lastPage(),
+            'per_page' => $petani->perPage(),
+            'total' => $petani->total(),
+        ]);
     }
 
     public function show($id)
@@ -51,13 +61,16 @@ class PetaniController extends Controller
 
     public function store(Request $request)
     {
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
         $validated = $request->validate([
             'nama_petani' => 'required|string|max:255',
             'nik' => 'required|string|size:16|unique:petani,nik',
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
-            'no_hp' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
         ]);
 
         $petani = Petani::create($validated);
@@ -75,7 +88,7 @@ class PetaniController extends Controller
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
-            'no_hp' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
         ]);
 
         $petani->update($validated);
@@ -85,6 +98,9 @@ class PetaniController extends Controller
 
     public function destroy($id)
     {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
         $petani = Petani::findOrFail($id);
         $petani->delete();
 

@@ -8,31 +8,39 @@ use App\Http\Controllers\Api\PetaniController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\WilayahController;
 
-// Auth
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Auth (no middleware)
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
-// Statistik
-Route::get('/statistik', [StatistikController::class, 'index']);
+// Protected API routes
+Route::middleware('auth:sanctum')->group(function () {
 
-// Wilayah
-Route::get('/kecamatan', [WilayahController::class, 'kecamatan']);
-Route::get('/desa/{kecamatanId}', [WilayahController::class, 'desa']);
+    // Auth
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-// Petani CRUD
-Route::get('/petani', [PetaniController::class, 'index']);
-Route::get('/petani/{id}', [PetaniController::class, 'show']);
-Route::post('/petani', [PetaniController::class, 'store']);
-Route::put('/petani/{id}', [PetaniController::class, 'update']);
-Route::delete('/petani/{id}', [PetaniController::class, 'destroy']);
+    // Statistik
+    Route::get('/statistik', [StatistikController::class, 'index']);
 
-// Lahan
-Route::get('/lahan', [LahanController::class, 'index']);
-Route::get('/lahan/{id}', [LahanController::class, 'show']);
-Route::get('/lahan/{id}/kunjungan', [LahanController::class, 'kunjungan']);
-Route::post('/lahan', [LahanController::class, 'store']);
-Route::put('/lahan/{id}', [LahanController::class, 'update']);
-Route::delete('/lahan/{id}', [LahanController::class, 'destroy']);
+    // Wilayah
+    Route::get('/kecamatan', [WilayahController::class, 'kecamatan']);
+    Route::get('/desa/{kecamatanId}', [WilayahController::class, 'desa']);
 
-// Kunjungan
-Route::get('/kunjungan', [KunjunganController::class, 'index']);
-Route::post('/kunjungan-lahan', [KunjunganController::class, 'store']);
+    // Petani CRUD
+    Route::get('/petani', [PetaniController::class, 'index']);
+    Route::get('/petani/{id}', [PetaniController::class, 'show']);
+    Route::post('/petani', [PetaniController::class, 'store']);
+    Route::put('/petani/{id}', [PetaniController::class, 'update']);
+    Route::delete('/petani/{id}', [PetaniController::class, 'destroy']);
+
+    // Lahan
+    Route::get('/lahan', [LahanController::class, 'index']);
+    Route::get('/lahan/{id}', [LahanController::class, 'show']);
+    Route::get('/lahan/{id}/kunjungan', [LahanController::class, 'kunjungan']);
+    Route::post('/lahan', [LahanController::class, 'store']);
+    Route::put('/lahan/{id}', [LahanController::class, 'update']);
+    Route::delete('/lahan/{id}', [LahanController::class, 'destroy']);
+
+    // Kunjungan
+    Route::get('/kunjungan', [KunjunganController::class, 'index']);
+    Route::post('/kunjungan-lahan', [KunjunganController::class, 'store']);
+
+});

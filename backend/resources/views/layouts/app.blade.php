@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -21,13 +21,14 @@
     
     <script>
         tailwind.config = {
+            darkMode: "class",
             theme: {
                 extend: {
                     fontFamily: {
                         public: ['"Public Sans"', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#16A34A', // Agriculture Green (Sneat styled)
+                        primary: '#16A34A',
                         'primary-hover': '#15803D',
                         secondary: '#8592a3',
                         success: '#71dd37',
@@ -40,9 +41,17 @@
                         muted: '#a1acb8',
                         background: '#f5f5f9',
                         border: '#d9dee3',
+                        'dark-surface': '#1e293b',
+                        'dark-border': '#334155',
+                        'dark-body': '#94a3b8',
+                        'dark-heading': '#f1f5f9',
+                        'dark-muted': '#64748b',
+                        'dark-bg': '#0f172a',
+                        'dark-card': '#1e293b',
                     },
                     boxShadow: {
                         card: '0 2px 6px 0 rgba(67, 89, 113, 0.12)',
+                        'card-dark': '0 2px 6px 0 rgba(0, 0, 0, 0.3)',
                         sm: '0 0.125rem 0.25rem rgba(161, 172, 184, 0.4)',
                         primary: '0 2px 4px 0 rgba(22, 163, 74, 0.4)',
                     }
@@ -60,6 +69,19 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d9dee3; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #b4bdc6; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .dark .swal2-popup {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .dark .swal2-title {
+            color: #f1f5f9 !important;
+        }
+        .dark .swal2-html-container {
+            color: #94a3b8 !important;
+        }
     </style>
     
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -68,7 +90,20 @@
     @stack('styles')
 </head>
 
-<body class="bg-background text-body font-public antialiased overflow-hidden" x-data="{ sidebarOpen: false }">
+<body class="bg-background dark:bg-dark-bg text-body dark:text-dark-body font-public antialiased overflow-hidden" x-data="{ sidebarOpen: false }">
+    
+    <!-- Dark Mode Init Script -->
+    <script>
+        (function() {
+            const stored = localStorage.getItem('tanipantau-dark-mode');
+            const html = document.documentElement;
+            if (stored === 'true' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        })();
+    </script>
     
     <!-- Layout Wrapper -->
     <div class="flex h-screen w-full relative">
@@ -76,7 +111,7 @@
         <!-- Sidebar Overlay (Mobile) -->
         <div x-show="sidebarOpen" 
              x-transition.opacity.duration.300ms
-             class="fixed inset-0 bg-dark/50 z-40 lg:hidden" 
+             class="fixed inset-0 bg-dark/50 dark:bg-black/60 z-40 lg:hidden" 
              @click="sidebarOpen = false" x-cloak>
         </div>
 
@@ -110,6 +145,11 @@
     </script>
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
     <script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('tanipantau-dark-mode', html.classList.contains('dark'));
+        }
         function confirmLogout() {
             Swal.fire({
                 title: 'Yakin ingin keluar?',
@@ -121,8 +161,8 @@
                 confirmButtonText: 'Ya, Keluar!',
                 cancelButtonText: 'Batal',
                 customClass: {
-                    title: 'font-public text-[18px] text-heading',
-                    popup: 'font-public rounded-[0.5rem] shadow-card border border-border',
+                    title: 'font-public text-[18px] text-heading dark:text-dark-heading',
+                    popup: 'font-public rounded-[0.5rem] shadow-card dark:shadow-card-dark border border-border dark:border-dark-border',
                     confirmButton: 'rounded-[0.375rem]',
                     cancelButton: 'rounded-[0.375rem]'
                 }

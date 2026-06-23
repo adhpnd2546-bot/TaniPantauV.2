@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\PetaniController;
 use App\Http\Controllers\Admin\LahanController;
 use App\Http\Controllers\Admin\KunjunganController;
+use App\Http\Controllers\Admin\PetugasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ Route::get('/dashboard', function () {
     $role = auth()->user()?->role;
 
     if ($role === 'manajer') {
-        return redirect('http://127.0.0.1:8000/frontend/index.php');
+        return redirect(config('app.frontend_url', 'http://127.0.0.1:8000/frontend') . '/index.php');
     }
 
     return redirect(match($role) {
@@ -68,10 +69,7 @@ Route::prefix('admin')
         Route::get('/kunjungan', [KunjunganController::class, 'index'])->name('kunjungan');
         Route::post('/kunjungan', [KunjunganController::class, 'store'])->name('kunjungan.store');
 
-        Route::get('/petugas', function () {
-            $petugas = \App\Models\User::where('role', 'petugas')->get();
-            return view('admin.petugas', compact('petugas'));
-        })->name('petugas');
+        Route::resource('petugas', PetugasController::class);
     });
 
 /*

@@ -41,7 +41,6 @@ class KunjunganController extends Controller
             'catatan_lapangan' => 'nullable|string',
             'foto' => 'nullable|image|max:2048',
             'status_tindak_lanjut' => 'required|in:aman,perlu_pemantauan,perlu_tindakan',
-            'status_fase' => 'required|in:persiapan,tanam,pemeliharaan,panen',
         ]);
 
         $validated['petugas_id'] = auth()->id();
@@ -50,15 +49,30 @@ class KunjunganController extends Controller
             $validated['foto'] = $request->file('foto')->store('kunjungan', 'public');
         }
 
-        $statusFase = $validated['status_fase'];
-        unset($validated['status_fase']);
+        $kunjungan = KunjunganLahan::create($validated);
 
-        KunjunganLahan::create($validated);
-
-        Lahan::where('id', $validated['lahan_id'])->update(['status_fase' => $statusFase]);
+        $this->updateFaseLahan($kunjungan->lahan_id);
 
         $redirect = auth()->user()->role === 'petugas' ? route('petugas.kunjungan.create') : route('admin.kunjungan');
 
         return redirect($redirect)->with('success', 'Kunjungan berhasil dicatat.');
+    }
+
+    private function updateFaseLahan($lahanId)
+    {
+        $lahan = Lahan::find($lahanId);
+        if (!$lahan) return;
+
+        $latest = KunjunganLahan::where('lahan_id', $lahanId)->latest()->first();
+        if (!$latest) return;
+
+        $faseOrder = ['persiapan' => 0, 'tanam' => 1, 'pemeliharaan' => 2, 'panen' => 3];
+        $currentFaseIndex = $faseOrder[$lahan->status_fase] ?? 0;
+
+        if ($latest->kondisi_lahan === 'baik' && $currentFaseIndex < 3) {
+            $fases = array_keys($faseOrder);
+            $lahan->status_fase = $fases[$currentFaseIndex + 1];
+            $lahan->save();
+        }
     }
 }

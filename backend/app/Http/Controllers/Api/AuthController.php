@@ -22,8 +22,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email atau password salah'], 401);
         }
 
+        $token = $user->createToken('api-token')->plainTextToken;
+
         return response()->json([
             'message' => 'Login berhasil',
+            'token' => $token,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -31,5 +34,12 @@ class AuthController extends Controller
                 'role' => $user->role,
             ],
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logout berhasil']);
     }
 }

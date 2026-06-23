@@ -11,7 +11,7 @@ return new class extends Migration
         $driver = DB::connection()->getDriverName();
 
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE users MODIFY COLUMN role VARCHAR(20) DEFAULT 'petugas'");
+            DB::statement("ALTER TABLE users MODIFY COLUMN role VARCHAR(20) NOT NULL DEFAULT 'petugas'");
         }
         // SQLite doesn't need changes - it stores all types as text
     }
@@ -21,7 +21,7 @@ return new class extends Migration
         $driver = DB::connection()->getDriverName();
 
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE users MODIFY COLUMN role VARCHAR(20) DEFAULT 'petugas'");
+            DB::statement("ALTER TABLE users MODIFY COLUMN role VARCHAR(20) NOT NULL DEFAULT 'petugas'");
         }
     }
 };

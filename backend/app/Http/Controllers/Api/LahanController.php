@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Lahan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LahanController extends Controller
 {
@@ -29,7 +30,10 @@ class LahanController extends Controller
             });
         }
 
-        $lahan = $query->get()->map(function ($item) {
+        $perPage = $request->input('per_page', 50);
+        $lahan = $query->paginate($perPage);
+
+        $data = $lahan->map(function ($item) {
             return [
                 'id' => $item->id,
                 'nama_lahan' => $item->nama_lahan,
@@ -49,7 +53,13 @@ class LahanController extends Controller
             ];
         });
 
-        return response()->json($lahan);
+        return response()->json([
+            'data' => $data,
+            'current_page' => $lahan->currentPage(),
+            'last_page' => $lahan->lastPage(),
+            'per_page' => $lahan->perPage(),
+            'total' => $lahan->total(),
+        ]);
     }
 
     public function show($id)
@@ -72,6 +82,7 @@ class LahanController extends Controller
             'petani' => $lahan->petani ? [
                 'id' => $lahan->petani->id,
                 'nama' => $lahan->petani->nama_petani,
+                'kecamatan' => $lahan->petani->kecamatan->nama ?? null,
             ] : null,
             'petani_id' => $lahan->petani_id,
             'belum_dikunjungi' => $lahan->kunjungan()->count() === 0,
@@ -96,6 +107,9 @@ class LahanController extends Controller
 
     public function store(Request $request)
     {
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
         $validated = $request->validate([
             'petani_id' => 'required|exists:petani,id',
             'nama_lahan' => 'required|string|max:255',
@@ -134,6 +148,9 @@ class LahanController extends Controller
 
     public function destroy($id)
     {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
         $lahan = Lahan::findOrFail($id);
         $lahan->delete();
 

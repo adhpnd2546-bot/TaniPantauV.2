@@ -33,7 +33,7 @@ class LahanController extends Controller
         }
 
         $lahan = $query->orderBy('created_at', 'desc')->paginate(10);
-        $petani = Petani::with('desa')->get();
+        $petani = Petani::all();
         $kecamatan = Kecamatan::all();
         $petugas = User::whereIn('role', ['petugas', 'admin'])->get();
         return view('admin.lahan', compact('lahan', 'petani', 'kecamatan', 'petugas'));

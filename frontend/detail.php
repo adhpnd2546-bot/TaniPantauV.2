@@ -13,7 +13,7 @@ if (!isLoggedIn() || getUserRole() !== 'manajer') {
 require_once 'includes/header.php';
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
+if (!$id || !ctype_digit($id)) {
     echo "<div class='container mt-5'><div class='alert alert-danger border-0'><i class='bi bi-exclamation-triangle-fill me-2'></i>ID Lahan tidak valid! <a href='index.php' class='alert-link'>Kembali</a></div></div>";
     require_once 'includes/footer.php'; exit;
 }

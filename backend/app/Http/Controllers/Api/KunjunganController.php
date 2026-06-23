@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\KunjunganLahan;
 use App\Models\Lahan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KunjunganController extends Controller
 {
@@ -30,9 +31,11 @@ class KunjunganController extends Controller
 
     public function store(Request $request)
     {
+        if (!in_array(Auth::user()->role, ['admin', 'petugas'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
         $validated = $request->validate([
             'lahan_id' => 'required|exists:lahan,id',
-            'petugas_id' => 'required|exists:users,id',
             'tanggal_kunjungan' => 'required|date',
             'kondisi_lahan' => 'required|in:baik,cukup,buruk',
             'catatan_lapangan' => 'nullable|string',

@@ -3,8 +3,8 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL'1;font-size:22px;">eco</span>
-                    <span class="fw-bold text-white" style="font-size:1rem;">TaniPantau</span>
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL'1;font-size:24px;">eco</span>
+                    <span class="fw-bold" style="font-size:1.1rem;color:white;letter-spacing:-0.03em;">Tani<span style="display:inline-block;background:#22c55e;color:white;padding:0 6px;border-radius:3px;margin-left:2px;">Pantau</span></span>
                 </div>
                 <p class="mb-0" style="max-width:360px;">Sistem monitoring lahan pertanian dan kunjungan petugas lapangan untuk mendukung produktivitas pertanian berkelanjutan.</p>
             </div>
@@ -33,6 +33,20 @@
 
 <script>
     window.addEventListener('pageshow', function(e) { if (e.persisted) window.location.reload(); });
+    function toggleFrontendDarkMode() {
+        var h = document.documentElement;
+        var theme = h.getAttribute('data-bs-theme');
+        var newTheme = theme === 'dark' ? 'light' : 'dark';
+        h.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('tanipantau-dark-mode', newTheme === 'dark');
+        var icon = document.getElementById('darkModeIcon');
+        if (icon) icon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+    (function(){
+        var s = localStorage.getItem('tanipantau-dark-mode');
+        var icon = document.getElementById('darkModeIcon');
+        if (s === 'true' && icon) icon.className = 'bi bi-sun-fill';
+    })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

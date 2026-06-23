@@ -4,28 +4,48 @@ namespace Database\Seeders;
 
 use App\Models\Kecamatan;
 use App\Models\Desa;
+use App\Models\Provinsi;
+use App\Models\Kota;
 use Illuminate\Database\Seeder;
 
 class WilayahSeeder extends Seeder
 {
     public function run(): void
     {
-        $kecamatanData = [
-            'Nglegok' => ['Jombok', 'Dayu', 'Modangan', 'Sumberasri', 'Kedawung', 'Nglegok', 'Bangsri', 'Krenceng', 'Suka Maju'],
-            'Ponggok' => ['Ponggok', 'Pojok', 'Candirejo', 'Gembongan', 'Bacem', 'Kawedusan', 'Ringinanyar', 'Sidorejo', 'Langon', 'Karangbendo', 'Sumber Rejo'],
-            'Udanawu' => ['Bakung', 'Sumbersih', 'Tunjung', 'Sukorejo', 'Besuki', 'Mangunan', 'Temenggungan', 'Gondang', 'Karangrejo', 'Tani Makmur'],
-            'Garum' => ['Garum', 'Bence', 'Karangrejo', 'Sumberdiren', 'Tingal', 'Sidodadi', 'Slorok', 'Kedungbunder', 'Kebonagung', 'Togogan'],
-            'Kademangan' => ['Kademangan', 'Sumberjati', 'Dawuhan', 'Sumberjo', 'Sumberagung', 'Banjarjo', 'Plumpungrejo', 'Suruhwadang', 'Darum', 'Jimbe'],
-            'Kanigoro' => ['Kanigoro', 'Satreyan', 'Sawentar', 'Tlogo', 'Kuningan', 'Gaprang', 'Jatinom', 'Minggirsari', 'Papungan', 'Gogodeso'],
-            'Wlingi' => ['Wlingi', 'Wlingi Barat', 'Temuwaras', 'Temon', 'Klemunan', 'Tangkil', 'Bangsri', 'Sukoharjo', 'Bendosari', 'Balerejo'],
-            'Selopuro' => ['Selopuro', 'Mronjo', 'Ploso', 'Popoh', 'Mandiri', 'Jatitengah', 'Plumbangan', 'Tawangrejo'],
-            'Srengat' => ['Srengat', 'Pakisrejo', 'Dermojayan', 'Kaulon', 'Dandong', 'Karanganyar', 'Kebonduren', 'Coper', 'Sragi', 'Kendalrejo'],
+        $provinsi = Provinsi::create(['nama' => 'Jawa Timur']);
+
+        $kabupatenData = [
+            'Blitar' => [
+                'Nglegok', 'Ponggok', 'Udanawu', 'Garum', 'Kademangan', 'Kanigoro', 'Wlingi',
+                'Selopuro', 'Srengat', 'Bakung', 'Binangun', 'Doko', 'Gandusari', 'Kesamben',
+                'Panggungrejo', 'Sanan Kulon', 'Selorejo', 'Sutojayan', 'Talun', 'Wates',
+                'Wonodadi', 'Wonotirto',
+            ],
+            'Kabupaten Malang' => [
+                'Ampelgading', 'Tirtoyudo', 'Singosari', 'Lawang', 'Pakis', 'Bantur',
+                'Bululawang', 'Dampit', 'Dau', 'Donomulyo', 'Gedangan', 'Gondanglegi',
+                'Jabung', 'Kalipare', 'Karangploso', 'Kasembon', 'Kepanjen', 'Kromengan',
+                'Ngajum', 'Ngantang', 'Pagak', 'Pagelaran', 'Pakisaji', 'Poncokusumo',
+                'Pujon', 'Sumbermanjing Wetan', 'Sumberpucung', 'Tajinan', 'Tumpang',
+                'Turen', 'Wagir', 'Wajak', 'Wonosari',
+            ],
+            'Kota Malang' => [
+                'Kedungkandang', 'Sukun', 'Klojen', 'Blimbing', 'Lowokwaru',
+            ],
+            'Kediri' => [
+                'Pare', 'Kandat', 'Plemahan', 'Kras', 'Badas', 'Banyakan', 'Gampengrejo',
+                'Grogol', 'Gurah', 'Kandangan', 'Kayen Kidul', 'Kepung', 'Kunjang',
+                'Mojo', 'Ngadiluwih', 'Ngancar', 'Pagu', 'Papar', 'Plosoklaten',
+                'Puncu', 'Purwoasri', 'Ringinrejo', 'Semen', 'Tarokan', 'Wates',
+            ],
         ];
 
-        foreach ($kecamatanData as $kecNama => $desaList) {
-            $kec = Kecamatan::create(['nama' => $kecNama]);
-            foreach ($desaList as $desaNama) {
-                Desa::create(['kecamatan_id' => $kec->id, 'nama' => $desaNama]);
+        foreach ($kabupatenData as $kabNama => $kecamatanList) {
+            $kab = Kota::create(['provinsi_id' => $provinsi->id, 'nama' => $kabNama]);
+            foreach ($kecamatanList as $kecNama) {
+                $kec = Kecamatan::create(['nama' => $kecNama, 'provinsi_id' => $provinsi->id, 'kota_id' => $kab->id]);
+                Desa::create(['kecamatan_id' => $kec->id, 'nama' => $kecNama . ' Satu']);
+                Desa::create(['kecamatan_id' => $kec->id, 'nama' => $kecNama . ' Dua']);
             }
         }
     }
