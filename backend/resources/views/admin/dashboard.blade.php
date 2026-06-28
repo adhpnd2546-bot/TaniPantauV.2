@@ -106,11 +106,31 @@
         </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="mt-6">
-        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card">
-            <div class="px-6 py-5 flex items-center justify-between border-b border-border dark:border-dark-border">
-                <h5 class="text-[1.125rem] font-medium text-heading dark:text-dark-heading m-0">Lahan Terbaru</h5>
+    @if(!empty($lahanPerPetugas))
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-6">
+            <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card p-6">
+                <h5 class="text-[1.125rem] font-medium text-heading dark:text-dark-heading m-0 mb-4">Lahan per Petugas</h5>
+                <div class="space-y-3">
+                    @foreach($lahanPerPetugas as $lp)
+                    <div>
+                        <div class="flex justify-between text-[13px] mb-1">
+                            <span class="font-medium text-heading dark:text-dark-heading">{{ $lp['name'] }}</span>
+                            <span class="text-muted dark:text-dark-muted">{{ $lp['total_petani'] }} petani · {{ $lp['total_lahan'] }} lahan</span>
+                        </div>
+                        @php $max = max(array_column($lahanPerPetugas, 'total_lahan')); @endphp
+                        <div class="w-full bg-[#e2e8f0] dark:bg-dark-border rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-primary h-2.5 rounded-full transition-all duration-500" style="width: {{ $max > 0 ? ($lp['total_lahan'] / $max) * 100 : 0 }}%;"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-6">
+            <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card">
+                <div class="px-6 py-5 flex items-center justify-between border-b border-border dark:border-dark-border">
+                    <h5 class="text-[1.125rem] font-medium text-heading dark:text-dark-heading m-0">Lahan Terbaru</h5>
                 <a href="{{ route('admin.lahan.index') }}"
                     class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white dark:bg-dark-card text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">
                     Lihat Lahan
@@ -161,6 +181,53 @@
                     </tbody>
                 </table>
             </div>
+                </div>
+            </div>
         </div>
     </div>
+    @else
+    <div class="mt-6">
+        <div class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card">
+            <div class="px-6 py-5 flex items-center justify-between border-b border-border dark:border-dark-border">
+                <h5 class="text-[1.125rem] font-medium text-heading dark:text-dark-heading m-0">Lahan Terbaru</h5>
+                <a href="{{ route('admin.lahan.index') }}"
+                    class="inline-block px-4 py-1.5 rounded-[0.375rem] bg-white dark:bg-dark-card text-primary text-[13px] font-semibold hover:bg-white/90 transition-all shadow-sm">
+                    Lihat Lahan
+                </a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Nama Lahan</th>
+                            <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Petani</th>
+                            <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Komoditas</th>
+                            <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Luas (Ha)</th>
+                            <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Fase</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[14px] text-body dark:text-dark-body">
+                        @forelse($lahanTerbaru as $l)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-dark-border/20 transition-colors">
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border font-medium text-heading dark:text-dark-heading">{{ $l->nama_lahan }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ $l->petani->nama_petani ?? '-' }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ ucfirst($l->komoditas) }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">{{ number_format($l->luas_lahan, 1) }}</td>
+                                <td class="px-6 py-3 border-b border-border dark:border-dark-border">
+                                    @php
+                                        $faseColors = ['persiapan' => 'bg-secondary/10 text-secondary', 'tanam' => 'bg-info/10 text-info', 'pemeliharaan' => 'bg-warning/10 text-warning', 'panen' => 'bg-success/10 text-success'];
+                                        $color = $faseColors[$l->status_fase] ?? 'bg-secondary/10 text-secondary';
+                                    @endphp
+                                    <span class="px-2 py-1 rounded-[0.25rem] {{ $color }} text-[12px] font-medium">{{ ucfirst($l->status_fase) }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data lahan.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
 @endsection

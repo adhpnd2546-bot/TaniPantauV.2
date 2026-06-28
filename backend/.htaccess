@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Handle root URL
+RewriteRule ^$ public/index.php [L]
+
+# Route everything else through Laravel
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ public/index.php [L]

@@ -72,13 +72,14 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[800px]">
+            <table class="w-full text-left border-collapse">
                 <thead>
                     <tr>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase w-16">#</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Nama Lahan</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Petani</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Komoditas</th>
+                        <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Petugas</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Luas (Ha)</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Fase</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase text-center w-32">Aksi</th>
@@ -91,6 +92,7 @@
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border font-medium text-heading dark:text-dark-heading">{{ $l->nama_lahan }}</td>
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border">{{ $l->petani->nama_petani ?? '-' }}</td>
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border text-heading dark:text-dark-heading">{{ ucfirst($l->komoditas) }}</td>
+                        <td class="px-6 py-4 border-b border-border dark:border-dark-border">{{ $l->petugas->name ?? '-' }}</td>
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border">{{ number_format($l->luas_lahan, 1) }}</td>
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border">
                             @php
@@ -107,22 +109,22 @@
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <a href="{{ route('admin.lahan.show', $l->id) }}" class="text-muted dark:text-dark-muted hover:text-primary transition-colors p-1" title="Detail">
-                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    <span class="material-symbols-outlined text-[18px] notranslate" translate="no">visibility</span>
                                 </a>
                                 <a href="{{ route('admin.lahan.edit', $l->id) }}" class="text-muted dark:text-dark-muted hover:text-primary transition-colors p-1" title="Edit">
-                                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                                    <span class="material-symbols-outlined text-[18px] notranslate" translate="no">edit</span>
                                 </a>
                                 <form action="{{ route('admin.lahan.destroy', $l->id) }}" method="POST" onsubmit="return confirm('Hapus data lahan ini?')" class="inline">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-muted dark:text-dark-muted hover:text-danger transition-colors p-1" title="Hapus">
-                                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                                        <span class="material-symbols-outlined text-[18px] notranslate" translate="no">delete</span>
                                     </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data lahan.</td></tr>
+                    <tr><td colspan="8" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data lahan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

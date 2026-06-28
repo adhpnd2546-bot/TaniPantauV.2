@@ -12,15 +12,13 @@
                 <h6 class="text-white fw-semibold mb-3" style="font-size:0.8125rem;">Akses Cepat</h6>
                 <div class="d-flex flex-column gap-1">
                     <a href="index.php" class="text-white-50 text-decoration-none" style="font-size:0.8125rem;">Beranda</a>
-                    <a href="login.php" class="text-white-50 text-decoration-none" style="font-size:0.8125rem;">Login Panel</a>
+                    <a href="index.php#statistik" class="text-white-50 text-decoration-none" style="font-size:0.8125rem;">Statistik</a>
                 </div>
             </div>
             <div class="col-md-3">
-                <h6 class="text-white fw-semibold mb-3" style="font-size:0.8125rem;">Akun Demo</h6>
+                <h6 class="text-white fw-semibold mb-3" style="font-size:0.8125rem;">Tentang</h6>
                 <div style="font-size:0.75rem;line-height:1.8;">
-                    <div><span class="text-white-50">Admin:</span> admin@admin.com / 123</div>
-                    <div><span class="text-white-50">Petugas:</span> petugas@petugas.com / 123</div>
-                    <div><span class="text-white-50">Manajer:</span> manajer@manajer.com / 123</div>
+                    <div>TaniPantau adalah portal monitoring lahan pertanian dan kunjungan petugas lapangan.</div>
                 </div>
             </div>
         </div>
@@ -32,23 +30,26 @@
 </footer>
 
 <script>
-    window.addEventListener('pageshow', function(e) { if (e.persisted) window.location.reload(); });
-    function toggleFrontendDarkMode() {
-        var h = document.documentElement;
-        var theme = h.getAttribute('data-bs-theme');
-        var newTheme = theme === 'dark' ? 'light' : 'dark';
-        h.setAttribute('data-bs-theme', newTheme);
-        localStorage.setItem('tanipantau-dark-mode', newTheme === 'dark');
-        var icon = document.getElementById('darkModeIcon');
-        if (icon) icon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-    }
-    (function(){
-        var s = localStorage.getItem('tanipantau-dark-mode');
-        var icon = document.getElementById('darkModeIcon');
-        if (s === 'true' && icon) icon.className = 'bi bi-sun-fill';
-    })();
+function toggleDarkMode() {
+    var h = document.documentElement;
+    var theme = h.getAttribute('data-bs-theme');
+    var newTheme = theme === 'dark' ? 'light' : 'dark';
+    h.setAttribute('data-bs-theme', newTheme);
+    localStorage.setItem('tanipantau-dark-mode', newTheme === 'dark');
+    var icon = document.getElementById('darkModeIcon');
+    if (icon) icon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var s = localStorage.getItem('tanipantau-dark-mode');
+    var icon = document.getElementById('darkModeIcon');
+    if (s === 'true' && icon) icon.className = 'bi bi-sun-fill';
+});
+</script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ once: true, offset: 50, duration: 600, easing: 'ease-in-out-cubic' });
+</script>
 </body>
 </html>

@@ -18,6 +18,21 @@
     <ul class="flex flex-col py-4 px-4 overflow-y-auto gap-1 flex-grow">
         <!-- Section Header -->
         <li class="px-4 mt-2 mb-2">
+            <span class="text-[11px] font-medium uppercase text-muted dark:text-dark-muted tracking-widest relative before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-[1px] before:bg-muted dark:before:bg-dark-muted ml-3">Menu Utama</span>
+        </li>
+
+        <!-- Dashboard -->
+        <li>
+            <a href="{{ route('petugas.dashboard') }}" class="flex items-center justify-between px-4 py-2.5 rounded-[0.375rem] {{ request()->routeIs('petugas.dashboard') ? 'bg-primary/10 text-primary font-medium' : 'text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary dark:hover:bg-dark-border/30' }} transition-colors">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('petugas.dashboard') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>dashboard</span>
+                    <span class="text-[15px]">Dashboard</span>
+                </div>
+            </a>
+        </li>
+
+        <!-- Section Header -->
+        <li class="px-4 mt-2 mb-2">
             <span class="text-[11px] font-medium uppercase text-muted dark:text-dark-muted tracking-widest relative before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-[1px] before:bg-muted dark:before:bg-dark-muted ml-3">Lapangan</span>
         </li>
         

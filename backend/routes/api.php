@@ -11,18 +11,20 @@ use App\Http\Controllers\Api\WilayahController;
 // Auth (no middleware)
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
+// Public API (read-only, no auth required for frontend)
+Route::get('/statistik', [StatistikController::class, 'index']);
+Route::get('/kecamatan', [WilayahController::class, 'kecamatan']);
+Route::get('/desa/{kecamatanId}', [WilayahController::class, 'desa']);
+Route::get('/lahan', [LahanController::class, 'index']);
+Route::get('/lahan/{id}', [LahanController::class, 'show']);
+Route::get('/lahan/{id}/kunjungan', [LahanController::class, 'kunjungan']);
+Route::get('/kunjungan', [KunjunganController::class, 'index']);
+
 // Protected API routes
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth
     Route::post('/auth/logout', [AuthController::class, 'logout']);
-
-    // Statistik
-    Route::get('/statistik', [StatistikController::class, 'index']);
-
-    // Wilayah
-    Route::get('/kecamatan', [WilayahController::class, 'kecamatan']);
-    Route::get('/desa/{kecamatanId}', [WilayahController::class, 'desa']);
 
     // Petani CRUD
     Route::get('/petani', [PetaniController::class, 'index']);
@@ -32,15 +34,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/petani/{id}', [PetaniController::class, 'destroy']);
 
     // Lahan
-    Route::get('/lahan', [LahanController::class, 'index']);
-    Route::get('/lahan/{id}', [LahanController::class, 'show']);
-    Route::get('/lahan/{id}/kunjungan', [LahanController::class, 'kunjungan']);
     Route::post('/lahan', [LahanController::class, 'store']);
     Route::put('/lahan/{id}', [LahanController::class, 'update']);
     Route::delete('/lahan/{id}', [LahanController::class, 'destroy']);
 
     // Kunjungan
-    Route::get('/kunjungan', [KunjunganController::class, 'index']);
     Route::post('/kunjungan-lahan', [KunjunganController::class, 'store']);
 
 });

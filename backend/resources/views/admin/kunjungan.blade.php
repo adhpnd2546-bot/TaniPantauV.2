@@ -18,7 +18,7 @@
 
     <div class=" bg-white dark:bg-dark-card  dark:bg-dark-card rounded-[0.5rem] shadow-card">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[900px]">
+            <table class="w-full text-left border-collapse">
                 <thead>
                     <tr>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase w-12">#</th>
@@ -27,6 +27,7 @@
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Petugas</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Kondisi</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Tindak Lanjut</th>
+                        <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Foto</th>
                         <th class="px-6 py-3 border-b border-border dark:border-dark-border bg-[#f9f9f9] dark:bg-dark-surface text-[12px] font-semibold tracking-wide text-muted dark:text-dark-muted uppercase">Catatan</th>
                     </tr>
                 </thead>
@@ -50,10 +51,27 @@
                             @endphp
                             <span class="px-2 py-1 rounded-[0.25rem] text-[12px] font-semibold inline-block" style="{{ $tindakStyles[$k->status_tindak_lanjut] ?? 'background:#8592a315;color:#8592a3;' }}">{{ $tindakLabels[$k->status_tindak_lanjut] ?? $k->status_tindak_lanjut }}</span>
                         </td>
+                        <td class="px-6 py-4 border-b border-border dark:border-dark-border">
+                            @if($k->foto)
+                                @php
+                                    $fotoPath = $k->foto;
+                                    if (str_starts_with($fotoPath, 'uploads/')) {
+                                        $fotoUrl = url($fotoPath);
+                                    } else {
+                                        $fotoUrl = url('storage/' . $fotoPath);
+                                    }
+                                @endphp
+                                <a href="{{ $fotoUrl }}" target="_blank" class="inline-block">
+                                    <img src="{{ $fotoUrl }}" alt="Foto kunjungan" class="w-12 h-12 rounded-[0.25rem] object-cover border border-border dark:border-dark-border hover:opacity-80 transition-opacity" loading="lazy">
+                                </a>
+                            @else
+                                <span class="text-muted dark:text-dark-muted">-</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 border-b border-border dark:border-dark-border max-w-[200px] truncate">{{ $k->catatan_lapangan ? Str::limit($k->catatan_lapangan, 50) : '-' }}</td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data kunjungan.</td></tr>
+                    <tr><td colspan="8" class="px-6 py-8 text-center text-muted dark:text-dark-muted">Belum ada data kunjungan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -18,17 +18,57 @@
             $role = auth()->user()->role;
             $notifList = [];
 
-            $tindakan = \App\Models\KunjunganLahan::where('status_tindak_lanjut', 'perlu_tindakan')->with('lahan.petani')->latest()->take(3)->get();
-            $linkTindak = match($role) { 'admin' => route('admin.kunjungan'), default => route('petugas.kunjungan.index') };
-            foreach ($tindakan as $k) {
-                $notifList[] = ['icon' => 'emergency', 'color' => 'text-warning', 'title' => $k->lahan->nama_lahan ?? '-', 'desc' => 'Perlu tindakan lanjut', 'link' => $linkTindak ];
+            // 1. Notifikasi Tindak Lanjut — hanya lahan yang kunjungan TERAKHIR-nya berstatus 'perlu_tindakan'
+            //    Jika petugas sudah berkunjung ulang dan menandai 'aman'/'perlu_pemantauan', notifikasi otomatis hilang.
+            $lahanPerluTindakan = \App\Models\Lahan::whereHas('kunjungan', function($q) use ($role) {
+                $q->where('status_tindak_lanjut', 'perlu_tindakan')
+                  ->whereRaw('id = (SELECT MAX(k2.id) FROM kunjungan_lahan k2 WHERE k2.lahan_id = kunjungan_lahan.lahan_id)');
+                if ($role === 'petugas') {
+                    $q->where('petugas_id', auth()->id());
+                }
+            })->with(['kunjungan' => function($q) {
+                $q->latest()->limit(1);
+            }])->latest()->take(3)->get();
+
+            $linkTindak = match($role) {
+                'admin' => route('admin.kunjungan'),
+                'manajer' => route('manajer.kunjungan'),
+                'petugas' => route('petugas.kunjungan.index'),
+                default => '#'
+            };
+
+            foreach ($lahanPerluTindakan as $l) {
+                $notifList[] = [
+                    'icon' => 'emergency',
+                    'color' => 'text-warning',
+                    'title' => $l->nama_lahan ?? '-',
+                    'desc' => 'Perlu tindakan lanjut',
+                    'link' => $linkTindak
+                ];
             }
 
-            $lahanBlm = \App\Models\Lahan::whereDoesntHave('kunjungan')->with('petani')->latest()->take(3)->get();
-            $linkLahan = match($role) { 'admin' => route('admin.lahan.show', 0), default => '#' };
+            // 2. Notifikasi Lahan Belum Dikunjungi — otomatis hilang setelah lahan mendapat kunjungan pertama
+            $lahanBlmQuery = \App\Models\Lahan::whereDoesntHave('kunjungan');
+            if ($role === 'petugas') {
+                $lahanBlmQuery->where('petugas_id', auth()->id());
+            }
+            $lahanBlm = $lahanBlmQuery->with('petani')->latest()->take(3)->get();
+
             foreach ($lahanBlm as $l) {
-                $link = $role === 'admin' ? route('admin.lahan.show', $l->id) : $linkLahan;
-                $notifList[] = ['icon' => 'warning', 'color' => 'text-danger', 'title' => $l->nama_lahan, 'desc' => 'Belum pernah dikunjungi', 'link' => $link ];
+                $link = match($role) {
+                    'admin' => route('admin.lahan.show', $l->id),
+                    'manajer' => route('manajer.lahan'),
+                    'petugas' => route('petugas.dashboard'),
+                    default => '#'
+                };
+
+                $notifList[] = [
+                    'icon' => 'warning',
+                    'color' => 'text-danger',
+                    'title' => $l->nama_lahan,
+                    'desc' => 'Belum pernah dikunjungi',
+                    'link' => $link
+                ];
             }
 
             $notifList = array_slice($notifList, 0, 5);
@@ -101,16 +141,16 @@
                     </div>
                 </div>
                 <div class="py-1">
-                    <a href="{{ route('profile.edit') }}" class="group flex items-center gap-2 px-4 py-2 text-[14px] text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-primary transition-colors">person</span> Profil
+                    <a href="{{ route('profile.edit') }}#profil" class="group flex items-center gap-2 px-4 py-2 text-[14px] text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-primary transition-colors notranslate" translate="no">person</span> Profil
                     </a>
-                    <a href="{{ route('profile.edit') }}" class="group flex items-center gap-2 px-4 py-2 text-[14px] text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-primary transition-colors">settings</span> Pengaturan
+                    <a href="{{ route('profile.edit') }}#keamanan" class="group flex items-center gap-2 px-4 py-2 text-[14px] text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-primary transition-colors notranslate" translate="no">settings</span> Pengaturan
                     </a>
                 </div>
                 <div class="border-t border-border dark:border-dark-border py-1">
                     <button onclick="confirmLogout()" class="group w-full flex items-center gap-2 px-4 py-2 text-[14px] text-body dark:text-dark-body hover:bg-danger/10 hover:text-danger transition-colors text-left">
-                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-danger transition-colors">power_settings_new</span> Keluar
+                        <span class="material-symbols-outlined text-[18px] text-muted dark:text-dark-muted group-hover:text-danger transition-colors notranslate" translate="no">power_settings_new</span> Keluar
                     </button>
                 </div>
             </div>

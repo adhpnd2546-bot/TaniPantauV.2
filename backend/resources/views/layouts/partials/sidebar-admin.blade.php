@@ -33,10 +33,20 @@
         
         <!-- Lahan -->
         <li>
-            <a href="{{ route('admin.lahan.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-[0.375rem] {{ request()->routeIs('admin.lahan*') ? 'bg-primary/10 text-primary font-medium' : 'text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary dark:hover:bg-dark-border/30' }} transition-colors group">
+            <a href="{{ route('admin.lahan.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-[0.375rem] {{ request()->routeIs('admin.lahan.index') || request()->routeIs('admin.lahan.create') || request()->routeIs('admin.lahan.edit') || request()->routeIs('admin.lahan.show') ? 'bg-primary/10 text-primary font-medium' : 'text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary dark:hover:bg-dark-border/30' }} transition-colors group">
                 <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-[20px] {{ request()->routeIs('admin.lahan*') ? '' : 'text-muted dark:text-dark-muted group-hover:text-primary' }} transition-colors" {{ request()->routeIs('admin.lahan*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>landscape</span>
+                    <span class="material-symbols-outlined text-[20px] {{ request()->routeIs('admin.lahan.index') || request()->routeIs('admin.lahan.create') || request()->routeIs('admin.lahan.edit') || request()->routeIs('admin.lahan.show') ? '' : 'text-muted dark:text-dark-muted group-hover:text-primary' }} transition-colors" {{ request()->routeIs('admin.lahan.index') || request()->routeIs('admin.lahan.create') || request()->routeIs('admin.lahan.edit') || request()->routeIs('admin.lahan.show') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>landscape</span>
                     <span class="text-[15px]">Area Lahan</span>
+                </div>
+            </a>
+        </li>
+        
+        <!-- Peta Lahan -->
+        <li>
+            <a href="{{ route('admin.lahan.map') }}" class="flex items-center justify-between px-4 py-2.5 rounded-[0.375rem] {{ request()->routeIs('admin.lahan.map') ? 'bg-primary/10 text-primary font-medium' : 'text-body dark:text-dark-body hover:bg-primary/5 hover:text-primary dark:hover:bg-dark-border/30' }} transition-colors group">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[20px] {{ request()->routeIs('admin.lahan.map') ? '' : 'text-muted dark:text-dark-muted group-hover:text-primary' }} transition-colors" {{ request()->routeIs('admin.lahan.map') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>map</span>
+                    <span class="text-[15px]">Peta Lahan</span>
                 </div>
             </a>
         </li>

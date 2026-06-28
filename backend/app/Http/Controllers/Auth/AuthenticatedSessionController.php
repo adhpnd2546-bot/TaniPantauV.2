@@ -11,9 +11,6 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         return view('auth.login');
@@ -29,14 +26,12 @@ class AuthenticatedSessionController extends Controller
 
         return match ($user->role) {
             'admin' => redirect()->intended(route('admin.dashboard')),
-            'petugas' => redirect()->intended(route('petugas.kunjungan.create')),
-            default => redirect()->intended(route('home')),
+            'petugas' => redirect()->intended(route('petugas.dashboard')),
+            'manajer' => redirect()->intended(route('manajer.dashboard')),
+            default => redirect()->intended(route('login')),
         };
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
@@ -45,6 +40,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

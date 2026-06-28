@@ -77,6 +77,17 @@
             </div>
 
             <div class="flex flex-col">
+                <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="petugas_id">Petugas Lapang (PPL)</label>
+                <select id="petugas_id" name="petugas_id" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card @error('petugas_id') border-danger @enderror">
+                    <option value="">-- Pilih Petugas --</option>
+                    @foreach($petugas as $p)
+                        <option value="{{ $p->id }}" {{ old('petugas_id', $petani->petugas_id ?? '') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                    @endforeach
+                </select>
+                @error('petugas_id') <small class="text-danger mt-1">{{ $message }}</small> @enderror
+            </div>
+
+            <div class="flex flex-col">
                 <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5">Status Petani</label>
                 <div class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] bg-[#f8f9fa] dark:bg-dark-surface flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-success inline-block"></span>
@@ -203,8 +214,10 @@
 
         // Disable submit button after click to prevent double submit
         document.querySelector('form').addEventListener('submit', function() {
-            btnSubmit.disabled = true;
             btnSubmit.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span> Menyimpan...';
+            setTimeout(function() {
+                btnSubmit.disabled = true;
+            }, 0);
         });
 
         // Trigger on load if editing

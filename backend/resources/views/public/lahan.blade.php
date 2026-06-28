@@ -47,14 +47,14 @@
 </head>
 <body class="font-sans antialiased text-midnight_text dark:text-white dark:bg-darkmode flex flex-col min-h-screen">
 <script>
-(function(){const s=localStorage.getItem('tanipantau-dark-mode');const h=document.documentElement;if(s==='true'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches)){h.classList.add('dark')}else{h.classList.remove('dark')}})();
+(function(){const s=localStorage.getItem('tanipantau-dark-mode');const h=document.documentElement;if(s==='true'){h.classList.add('dark')}else{h.classList.remove('dark')}if(!s){localStorage.setItem('tanipantau-dark-mode','false')}})();
 </script>
 <!-- TopNavBar -->
 <header class="fixed top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-border dark:bg-darkmode/90 dark:border-gray/30 transition-all shadow-sm">
     <div class="container mx-auto lg:max-w-screen-xl md:max-w-screen-md flex items-center justify-between px-4 py-6 transition-all duration-300">
-        <a href="/" class="flex items-center gap-2 text-primary font-heading font-bold text-2xl">
+        <a href="/" class="flex items-center gap-2.5 text-primary font-heading font-bold text-2xl">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 32px;">eco</span>
-            TaniPantau
+            <span>Tani<span class="bg-primary text-white px-1.5 py-0.5 rounded ml-0.5 text-lg">Pantau</span></span>
         </a>
         <nav class="hidden lg:flex flex-grow items-center justify-center space-x-6 font-medium">
             <a href="/" class="text-midnight_text dark:text-white hover:text-primary transition-colors">Beranda</a>
@@ -255,9 +255,9 @@
     <div class="container mx-auto lg:max-w-screen-xl md:max-w-screen-md pt-20 pb-10 px-6 lg:px-4">
         <div class="grid grid-cols-12 gap-8 lg:gap-4 mb-16">
             <div class="lg:col-span-4 col-span-12 flex flex-col">
-                <a class="mb-6 flex items-center gap-2 text-primary font-heading font-bold text-3xl" href="/">
+                <a class="mb-6 flex items-center gap-2.5 text-primary font-heading font-bold text-3xl" href="/">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 36px;">eco</span>
-                    TaniPantau
+                    <span>Tani<span class="bg-primary text-white px-1.5 py-0.5 rounded ml-0.5">Pantau</span></span>
                 </a>
                 <p class="text-gray text-base leading-relaxed max-w-sm mb-6">Platform enterprise terpadu untuk monitoring dan manajemen lahan pertanian di seluruh Indonesia.</p>
                 <div class="flex gap-3">

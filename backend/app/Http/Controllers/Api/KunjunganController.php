@@ -21,7 +21,7 @@ class KunjunganController extends Controller
                 'tanggal_kunjungan' => $k->tanggal_kunjungan,
                 'kondisi_lahan' => $k->kondisi_lahan,
                 'catatan_lapangan' => $k->catatan_lapangan,
-                'foto' => $k->foto ? url('storage/' . $k->foto) : null,
+                'foto' => $k->foto ? (str_starts_with($k->foto, 'uploads/') ? url($k->foto) : url('storage/' . $k->foto)) : null,
                 'status_tindak_lanjut' => $k->status_tindak_lanjut,
             ];
         });
@@ -46,6 +46,8 @@ class KunjunganController extends Controller
         if ($request->hasFile('foto')) {
             $validated['foto'] = $request->file('foto')->store('kunjungan', 'public');
         }
+
+        $validated['petugas_id'] = Auth::id();
 
         $kunjungan = KunjunganLahan::create($validated);
 

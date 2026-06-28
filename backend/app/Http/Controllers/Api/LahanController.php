@@ -11,7 +11,7 @@ class LahanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Lahan::with('petani.kecamatan', 'petani.desa');
+        $query = Lahan::with('petani.kecamatan', 'petani.desa')->withCount('kunjungan');
 
         if ($request->komoditas) {
             $query->where('komoditas', $request->komoditas);
@@ -29,6 +29,14 @@ class LahanController extends Controller
                 $q->where('petugas_id', $request->petugas);
             });
         }
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_lahan', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('petani', function ($qp) use ($request) {
+                      $qp->where('nama_petani', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
 
         $perPage = $request->input('per_page', 50);
         $lahan = $query->paginate($perPage);
@@ -43,11 +51,12 @@ class LahanController extends Controller
                 'longitude' => $item->longitude,
                 'tanggal_tanam' => $item->tanggal_tanam,
                 'status_fase' => $item->status_fase,
-                'belum_dikunjungi' => $item->kunjungan()->count() === 0,
+                'belum_dikunjungi' => $item->kunjungan_count === 0,
                 'petani' => $item->petani ? [
                     'id' => $item->petani->id,
                     'nama' => $item->petani->nama_petani,
                     'kecamatan' => $item->petani->kecamatan->nama ?? null,
+                    'kecamatan_id' => $item->petani->kecamatan_id ?? null,
                 ] : null,
                 'petani_id' => $item->petani_id,
             ];
@@ -85,7 +94,7 @@ class LahanController extends Controller
                 'kecamatan' => $lahan->petani->kecamatan->nama ?? null,
             ] : null,
             'petani_id' => $lahan->petani_id,
-            'belum_dikunjungi' => $lahan->kunjungan()->count() === 0,
+            'belum_dikunjungi' => $lahan->kunjungan->count() === 0,
             'google_maps_link' => $lahan->latitude && $lahan->longitude
                 ? "https://www.google.com/maps?q={$lahan->latitude},{$lahan->longitude}"
                 : null,
@@ -95,7 +104,7 @@ class LahanController extends Controller
                     'tanggal_kunjungan' => $k->tanggal_kunjungan,
                     'kondisi_lahan' => $k->kondisi_lahan,
                     'catatan_lapangan' => $k->catatan_lapangan,
-                    'foto' => $k->foto ? url('storage/' . $k->foto) : null,
+                    'foto' => $k->foto ? (str_starts_with($k->foto, 'uploads/') ? url($k->foto) : url('storage/' . $k->foto)) : null,
                     'status_tindak_lanjut' => $k->status_tindak_lanjut,
                     'petugas' => $k->petugas ? $k->petugas->name : null,
                 ];
@@ -115,8 +124,8 @@ class LahanController extends Controller
             'nama_lahan' => 'required|string|max:255',
             'komoditas' => 'required|in:padi,jagung,hortikultura',
             'luas_lahan' => 'required|numeric|min:0',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
             'tanggal_tanam' => 'nullable|date',
             'status_fase' => 'required|in:persiapan,tanam,pemeliharaan,panen',
         ]);
@@ -135,8 +144,8 @@ class LahanController extends Controller
             'nama_lahan' => 'required|string|max:255',
             'komoditas' => 'required|in:padi,jagung,hortikultura',
             'luas_lahan' => 'required|numeric|min:0',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
             'tanggal_tanam' => 'nullable|date',
             'status_fase' => 'required|in:persiapan,tanam,pemeliharaan,panen',
         ]);
@@ -171,7 +180,7 @@ class LahanController extends Controller
                 'tanggal_kunjungan' => $k->tanggal_kunjungan,
                 'kondisi_lahan' => $k->kondisi_lahan,
                 'catatan_lapangan' => $k->catatan_lapangan,
-                'foto' => $k->foto ? url('storage/' . $k->foto) : null,
+                'foto' => $k->foto ? (str_starts_with($k->foto, 'uploads/') ? url($k->foto) : url('storage/' . $k->foto)) : null,
                 'status_tindak_lanjut' => $k->status_tindak_lanjut,
                 'petugas' => $k->petugas ? $k->petugas->name : null,
             ];

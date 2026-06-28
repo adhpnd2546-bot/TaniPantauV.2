@@ -61,6 +61,10 @@
                     <small class="text-[11px] font-semibold text-muted dark:text-dark-muted uppercase tracking-widest block mb-1">Wilayah Administratif</small>
                     <p class="text-[15px] font-medium text-heading dark:text-dark-heading m-0">{{ $lahan->petani->desa->nama ?? '-' }}, Kec. {{ $lahan->petani->kecamatan->nama ?? '-' }}</p>
                 </div>
+                <div>
+                    <small class="text-[11px] font-semibold text-muted dark:text-dark-muted uppercase tracking-widest block mb-1">Petugas Lapang</small>
+                    <p class="text-[15px] font-medium text-heading dark:text-dark-heading m-0">{{ $lahan->petugas->name ?? 'Belum ditugaskan' }}</p>
+                </div>
             </div>
         </div>
 

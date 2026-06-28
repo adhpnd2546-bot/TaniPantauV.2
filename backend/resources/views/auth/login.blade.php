@@ -5,7 +5,7 @@
     (function(){
         var s=localStorage.getItem('tanipantau-dark-mode');
         var h=document.documentElement;
-        if(s==='true'||(!s&&window.matchMedia('(prefers-color-scheme:dark)').matches)){
+        if(s==='true'){
             h.classList.add('dark');
         } else {
             h.classList.remove('dark');
@@ -15,6 +15,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Login - TaniPantau</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -67,6 +69,24 @@
         }
         .dark .swal2-popup { background: #1e293b !important; border-color: #334155 !important; }
         .dark .swal2-title { color: #f1f5f9 !important; }
+
+        /* Custom Autofill Styles for Light/Dark Mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+            -webkit-text-fill-color: #131b2e !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        .dark input:-webkit-autofill,
+        .dark input:-webkit-autofill:hover,
+        .dark input:-webkit-autofill:focus,
+        .dark input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
     </style>
 </head>
 
@@ -186,7 +206,7 @@
                 <!-- Input: Email/Username -->
                 <div class="space-y-2">
                     <label class="block text-[13px] font-medium text-gray-700 dark:text-dark-body" for="email">Email</label>
-                    <input class="block w-full px-4 py-2.5 bg-transparent border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-gray-900 dark:text-dark-heading placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-dark-card focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('email') border-red-500 @enderror" id="email" name="email" placeholder="nama@perusahaan.com" required="" type="email" />
+                    <input class="block w-full px-4 py-2.5 bg-white dark:bg-darklight border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-midnight_text dark:text-white placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-darklight focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('email') border-red-500 @enderror" id="email" name="email" placeholder="nama@perusahaan.com" required="" type="email" />
                     @error('email') <p class="text-[13px] text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 
@@ -197,7 +217,7 @@
                         <a class="text-[13px] text-gray-500 dark:text-dark-muted hover:text-gray-900 dark:hover:text-dark-heading transition-colors" href="{{ route('password.request') }}">Lupa sandi?</a>
                     </div>
                     <div class="relative">
-                        <input class="block w-full px-4 py-2.5 pr-10 bg-transparent border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-gray-900 dark:text-dark-heading placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-dark-card focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('password') border-red-500 @enderror" id="password" name="password" placeholder="••••••••" required="" type="password" />
+                        <input class="block w-full px-4 py-2.5 pr-10 bg-white dark:bg-darklight border border-gray-200 dark:border-dark-border rounded-lg text-[15px] text-midnight_text dark:text-white placeholder-gray-400 dark:placeholder-dark-muted focus:bg-white dark:focus:bg-darklight focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-all focus-visible:outline-none @error('password') border-red-500 @enderror" id="password" name="password" placeholder="••••••••" required="" type="password" />
                         <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-muted hover:text-gray-700 dark:hover:text-dark-heading transition-colors">
                             <span id="eyeIcon" class="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
@@ -211,16 +231,7 @@
                 </button>
             </form>
             
-            <!-- Demo Accounts Section -->
-            <div class="mt-10 text-center">
-                <p class="text-[13px] text-gray-500 dark:text-dark-muted mb-2">Demo</p>
-                <div class="flex items-center justify-center gap-3 text-[13px] font-medium">
-                    <button onclick="loginAs('admin')" class="text-gray-700 dark:text-dark-body underline underline-offset-2 hover:text-emerald-600 dark:hover:text-primary transition-colors" type="button">Admin</button>
-                    <span class="text-gray-300 dark:text-dark-border">|</span>
-                    <button onclick="loginAs('petugas')" class="text-gray-700 dark:text-dark-body underline underline-offset-2 hover:text-emerald-600 dark:hover:text-primary transition-colors" type="button">Petugas</button>
 
-                </div>
-            </div>
         </div>
     </div>
 
@@ -235,11 +246,6 @@
             const e = document.getElementById('eyeIcon');
             if (p.type === 'password') { p.type = 'text'; e.textContent = 'visibility_off'; }
             else { p.type = 'password'; e.textContent = 'visibility'; }
-        }
-        function loginAs(role) {
-            document.getElementById('email').value = role + '@' + role + '.com';
-            document.getElementById('password').value = '123';
-            document.getElementById('loginForm').submit();
         }
     </script>
     

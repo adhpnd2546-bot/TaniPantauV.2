@@ -11,7 +11,7 @@ class Petani extends Model
     protected $table = 'petani';
 
     protected $fillable = [
-        'nama_petani', 'nik', 'alamat', 'kecamatan_id', 'desa_id', 'no_hp'
+        'nama_petani', 'nik', 'alamat', 'kecamatan_id', 'desa_id', 'no_hp', 'petugas_id'
     ];
 
     public function lahan(): HasMany
@@ -27,5 +27,10 @@ class Petani extends Model
     public function desa(): BelongsTo
     {
         return $this->belongsTo(Desa::class);
+    }
+
+    public function petugas(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'petugas_id');
     }
 }

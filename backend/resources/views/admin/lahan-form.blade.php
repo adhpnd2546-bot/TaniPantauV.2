@@ -24,7 +24,7 @@
                 <select id="petani_id" name="petani_id" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card" required>
                     <option value="">Pilih Petani...</option>
                     @foreach($petani as $p)
-                        <option value="{{ $p->id }}" {{ old('petani_id', $lahan->petani_id ?? '') == $p->id ? 'selected' : '' }}>{{ $p->nama_petani }} ({{ $p->desa->nama ?? '-' }})</option>
+                        <option value="{{ $p->id }}" data-petugas="{{ $p->petugas_id }}" {{ old('petani_id', $lahan->petani_id ?? '') == $p->id ? 'selected' : '' }}>{{ $p->nama_petani }} ({{ $p->desa->nama ?? '-' }})</option>
                     @endforeach
                 </select>
                 @error('petani_id') <small class="text-danger mt-1">{{ $message }}</small> @enderror
@@ -34,6 +34,17 @@
                 <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="nama_lahan">Nama Lahan <span class="text-danger">*</span></label>
                 <input type="text" id="nama_lahan" name="nama_lahan" value="{{ old('nama_lahan', $lahan->nama_lahan ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card" required>
                 @error('nama_lahan') <small class="text-danger mt-1">{{ $message }}</small> @enderror
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="petugas_id">Petugas Lapang</label>
+                <select id="petugas_id" name="petugas_id" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card">
+                    <option value="">-- Ikut Petani (otomatis) --</option>
+                    @foreach($petugas as $p)
+                        <option value="{{ $p->id }}" {{ old('petugas_id', $lahan->petugas_id ?? '') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                    @endforeach
+                </select>
+                @error('petugas_id') <small class="text-danger mt-1">{{ $message }}</small> @enderror
             </div>
 
             <div class="flex flex-col">
@@ -53,17 +64,17 @@
             </div>
 
             <div class="flex flex-col md:col-span-2">
-                <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5">Lokasi (Klik pada peta) <span class="text-muted dark:text-dark-muted font-normal">*</span></label>
+                <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5">Lokasi (Klik pada peta) <span class="text-danger">*</span></label>
                 <div id="mapPicker" class="w-full h-[300px] rounded-[0.375rem] border border-border dark:border-dark-border mb-2"></div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="latitude">Latitude</label>
-                        <input type="text" id="latitude" name="latitude" x-model="lat" value="{{ old('latitude', $lahan->latitude ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card font-mono" readonly>
+                        <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="latitude">Latitude <span class="text-danger">*</span></label>
+                        <input type="text" id="latitude" name="latitude" x-model="lat" value="{{ old('latitude', $lahan->latitude ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card font-mono @error('latitude') border-danger @enderror" readonly>
                         @error('latitude') <small class="text-danger mt-1">{{ $message }}</small> @enderror
                     </div>
                     <div>
-                        <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="longitude">Longitude</label>
-                        <input type="text" id="longitude" name="longitude" x-model="lng" value="{{ old('longitude', $lahan->longitude ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card font-mono" readonly>
+                        <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="longitude">Longitude <span class="text-danger">*</span></label>
+                        <input type="text" id="longitude" name="longitude" x-model="lng" value="{{ old('longitude', $lahan->longitude ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card font-mono @error('longitude') border-danger @enderror" readonly>
                         @error('longitude') <small class="text-danger mt-1">{{ $message }}</small> @enderror
                     </div>
                 </div>
@@ -71,7 +82,7 @@
 
             <div class="flex flex-col">
                 <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="tanggal_tanam">Tanggal Tanam</label>
-                <input type="date" id="tanggal_tanam" name="tanggal_tanam" value="{{ old('tanggal_tanam', $lahan->tanggal_tanam ?? date('Y-m-d')) }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white">
+                <input type="date" id="tanggal_tanam" name="tanggal_tanam" value="{{ old('tanggal_tanam', $lahan->tanggal_tanam ?? date('Y-m-d')) }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card">
                 @error('tanggal_tanam') <small class="text-danger mt-1">{{ $message }}</small> @enderror
             </div>
 
@@ -127,6 +138,19 @@
                 marker = L.marker(e.latlng).addTo(map);
             }
         });
+
+        // Auto-fill petugas_id when petani changes
+        const petaniSelect = document.getElementById('petani_id');
+        const petugasSelect = document.getElementById('petugas_id');
+        if (petaniSelect && petugasSelect) {
+            petaniSelect.addEventListener('change', function() {
+                const selected = petaniSelect.options[petaniSelect.selectedIndex];
+                const petugasId = selected ? selected.getAttribute('data-petugas') : '';
+                if (petugasId && !petugasSelect.value) {
+                    petugasSelect.value = petugasId;
+                }
+            });
+        }
     });
 </script>
 @endpush

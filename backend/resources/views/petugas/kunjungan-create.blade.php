@@ -32,8 +32,9 @@
 
 @section('content')
     @if(session('success'))
-    <div class="mb-4 px-4 py-3 bg-success/10 border border-success/20 text-success rounded-[0.5rem] text-[14px] font-medium">
-        {{ session('success') }}
+    <div class="mb-4 px-4 py-3 bg-success/10 border border-success/20 text-success rounded-[0.5rem] text-[14px] font-medium flex items-center justify-between">
+        <span>{{ session('success') }}</span>
+        <a href="{{ route('petugas.kunjungan.index') }}" class="text-success font-semibold underline hover:no-underline">Lihat Riwayat</a>
     </div>
     @endif
 
@@ -43,7 +44,7 @@
             <p class="text-[0.9375rem] text-body dark:text-dark-body m-0">Catat hasil inspeksi lapangan secara real-time.</p>
         </div>
 
-        <form action="{{ route(auth()->user()?->role === 'petugas' ? 'petugas.kunjungan.store' : 'admin.kunjungan.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card border border-border/50 dark:border-dark-border/50 overflow-hidden">
+        <form action="{{ route('petugas.kunjungan.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-dark-card rounded-[0.5rem] shadow-card border border-border/50 dark:border-dark-border/50 overflow-hidden">
             @csrf
 
             <div class="p-6 sm:p-8 border-b border-border/50 dark:border-dark-border/50">
@@ -147,7 +148,7 @@
             </div>
 
             <div class="px-6 py-4 border-t border-border/50 dark:border-dark-border/50 bg-[#f9f9f9] dark:bg-dark-surface flex justify-end gap-3">
-                <a href="{{ route(auth()->user()?->role === 'petugas' ? 'petugas.kunjungan.index' : 'admin.kunjungan') }}" class="px-5 py-2 bg-white dark:bg-dark-card border border-border dark:border-dark-border rounded-[0.375rem] text-[14px] text-heading dark:text-dark-heading font-medium hover:bg-slate-100 dark:hover:bg-dark-border/30 transition-colors shadow-sm inline-block text-center no-underline">Batal</a>
+                <a href="{{ route('petugas.kunjungan.index') }}" class="px-5 py-2 bg-white dark:bg-dark-card border border-border dark:border-dark-border rounded-[0.375rem] text-[14px] text-heading dark:text-dark-heading font-medium hover:bg-slate-100 dark:hover:bg-dark-border/30 transition-colors shadow-sm inline-block text-center no-underline">Batal</a>
                 <button type="submit" class="px-5 py-2 bg-primary text-white rounded-[0.375rem] text-[14px] font-medium hover:bg-primary-hover transition-colors shadow-primary flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">check</span>
                     Simpan Laporan

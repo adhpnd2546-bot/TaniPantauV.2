@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>@yield('title', 'Sneat - TaniPantau')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -97,11 +99,7 @@
         (function() {
             const stored = localStorage.getItem('tanipantau-dark-mode');
             const html = document.documentElement;
-            if (stored === 'true' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
+            if (stored === 'true') { html.classList.add('dark') } else { html.classList.remove('dark') } if (!stored) { localStorage.setItem('tanipantau-dark-mode', 'false') }
         })();
     </script>
     
@@ -118,6 +116,8 @@
         <!-- Sidebar Start -->
         @if(auth()->user()?->role === 'petugas')
             @include('layouts.partials.sidebar-petugas')
+        @elseif(auth()->user()?->role === 'manajer')
+            @include('layouts.partials.sidebar-manajer')
         @else
             @include('layouts.partials.sidebar-admin')
         @endif
@@ -143,7 +143,7 @@
     <script>
         window.addEventListener('pageshow', function(e) { if (e.persisted) window.location.reload(); });
     </script>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
+    <form id="logout-form" action="{{ route('logout') }}" method="GET" class="hidden">@csrf</form>
     <script>
         function toggleDarkMode() {
             const html = document.documentElement;

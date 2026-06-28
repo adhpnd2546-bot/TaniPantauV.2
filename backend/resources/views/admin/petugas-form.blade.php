@@ -50,9 +50,12 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('btnSubmit').addEventListener('click', function() {
-            this.disabled = true;
-            this.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span> Menyimpan...';
+        document.querySelector('form').addEventListener('submit', function() {
+            const btn = document.getElementById('btnSubmit');
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span> Menyimpan...';
+            setTimeout(function() {
+                btn.disabled = true;
+            }, 0);
         });
     });
 </script>

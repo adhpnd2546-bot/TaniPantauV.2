@@ -25,6 +25,7 @@ class PetaniController extends Controller
                 'desa_id' => $p->desa_id,
                 'desa' => $p->desa ? $p->desa->nama : null,
                 'no_hp' => $p->no_hp,
+                'petugas_id' => $p->petugas_id,
             ];
         });
 
@@ -55,6 +56,7 @@ class PetaniController extends Controller
             'desa_id' => $p->desa_id,
             'desa' => $p->desa ? $p->desa->nama : null,
             'no_hp' => $p->no_hp,
+            'petugas_id' => $p->petugas_id,
             'total_lahan' => $p->lahan->count(),
         ]);
     }
@@ -71,9 +73,14 @@ class PetaniController extends Controller
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
             'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'petugas_id' => 'nullable|exists:users,id',
         ]);
 
         $petani = Petani::create($validated);
+
+        if ($validated['petugas_id'] ?? null) {
+            \App\Models\Lahan::where('petani_id', $petani->id)->update(['petugas_id' => $validated['petugas_id']]);
+        }
 
         return response()->json($petani->load(['kecamatan', 'desa']), 201);
     }
@@ -89,9 +96,12 @@ class PetaniController extends Controller
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
             'no_hp' => 'required|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'petugas_id' => 'nullable|exists:users,id',
         ]);
 
         $petani->update($validated);
+
+        \App\Models\Lahan::where('petani_id', $petani->id)->update(['petugas_id' => $validated['petugas_id'] ?? null]);
 
         return response()->json($petani->load(['kecamatan', 'desa']));
     }

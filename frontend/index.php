@@ -1,15 +1,5 @@
 <?php
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-
 require_once 'includes/api.php';
-require_once 'includes/auth.php';
-
-if (!isLoggedIn() || getUserRole() !== 'manajer') {
-    header('Location: login.php');
-    exit;
-}
-
 require_once 'includes/header.php';
 
 $kecamatanList = apiGet('/kecamatan');
@@ -29,28 +19,12 @@ if (!empty($statsData)) {
     $lahanPerluTindakan = 0;
 }
 
-$filterKomoditas = $_GET['komoditas'] ?? '';
-$filterFase = $_GET['status_fase'] ?? '';
-$filterKecamatan = $_GET['kecamatan'] ?? '';
-$filterBelumDikunjungi = $_GET['belum_dikunjungi'] ?? '';
-
-$apiUrl = '/lahan?per_page=9999';
-$params = [];
-if ($filterKomoditas) $params[] = 'komoditas=' . urlencode($filterKomoditas);
-if ($filterFase) $params[] = 'status_fase=' . urlencode($filterFase);
-if ($filterKecamatan) $params[] = 'kecamatan=' . urlencode($filterKecamatan);
-if (count($params)) $apiUrl .= '&' . implode('&', $params);
-
-$apiResponse = apiGet($apiUrl);
+$apiResponse = apiGet('/lahan?per_page=9999');
 $allLahan = [];
 if (is_array($apiResponse)) {
     $allLahan = isset($apiResponse['data']) ? $apiResponse['data'] : $apiResponse;
 }
 if (!is_array($allLahan)) $allLahan = [];
-
-if ($filterBelumDikunjungi === '1') {
-    $allLahan = array_filter($allLahan, fn($l) => !empty($l['belum_dikunjungi']));
-}
 
 $commoditiesCount = [];
 $statusCount = [];
@@ -61,41 +35,141 @@ foreach ($allLahan as $l) {
 arsort($commoditiesCount); arsort($statusCount);
 $maxCom = !empty($commoditiesCount) ? max($commoditiesCount) : 1;
 $maxSt = !empty($statusCount) ? max($statusCount) : 1;
-
-$searchQuery = $_GET['search'] ?? '';
-$filteredLahan = $allLahan;
-if (!empty($searchQuery)) {
-    $searchLower = strtolower($searchQuery);
-    $filteredLahan = array_filter($allLahan, fn($l) =>
-        strpos(strtolower($l['nama_lahan'] ?? ''), $searchLower) !== false ||
-        strpos(strtolower($l['petani']['nama'] ?? ''), $searchLower) !== false ||
-        strpos(strtolower($l['petani']['kecamatan'] ?? ''), $searchLower) !== false
-    );
-}
-$isSearching = !empty($searchQuery);
-$searchCount = count($filteredLahan);
-
-$perPage = 10;
-$totalFiltered = count($filteredLahan);
-$totalPages = max(1, ceil($totalFiltered / $perPage));
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-if ($page > $totalPages) $page = $totalPages;
-$pagedLahan = array_slice($filteredLahan, ($page - 1) * $perPage, $perPage);
-
-function faseColor($s) { return match(strtolower($s)) { 'persiapan' => 'badge-persiapan', 'tanam' => 'badge-tanam', 'pemeliharaan' => 'badge-pemeliharaan', 'panen' => 'badge-panen', default => 'badge-persiapan' }; }
-function stBadge($s) { return match(true) { $s==='aman' => 'badge-aman', $s==='perlu_pemantauan' => 'badge-pantau', $s==='perlu_tindakan' => 'badge-tindakan', default => 'badge-secondary' }; }
-function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_pemantauan' => 'Pantau', $s==='perlu_tindakan' => 'Tindakan', default => ucfirst($s) }; }
 ?>
 <div class="hero-wrap text-white text-center">
     <div class="container">
         <div class="hero-icon"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1;font-size:48px;color:#22c55e;">eco</span></div>
         <h1 class="text-white fw-bold mb-2" style="font-size: 2.75rem;letter-spacing:-0.03em;">Tani<span style="display:inline-block;background:#22c55e;color:white;padding:2px 12px;border-radius:6px;margin-left:4px;">Pantau</span></h1>
-        <p class="text-white/80 mb-5 mx-auto" style="max-width: 520px; font-size: 1.1rem;">Dashboard Monitoring Lahan Pertanian dan Kunjungan Petugas Lapangan</p>
+        <p class="text-white/80 mb-5 mx-auto" style="max-width: 520px; font-size: 1.1rem;">Portal Monitoring Lahan Pertanian dan Kunjungan Petugas Lapangan</p>
         <a href="#statistik" class="btn btn-light rounded-pill px-5 fw-bold text-primary">
             <i class="bi bi-arrow-down me-2"></i> Lihat Ringkasan
         </a>
     </div>
 </div>
+
+<!-- Keunggulan -->
+<section class="py-5 position-relative overflow-hidden section-bg">
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" style="background-image:url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2319854a' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="position-relative rounded-4 overflow-hidden shadow-lg">
+                    <img src="https://loremflickr.com/600/400/sawah,paddy/all?lock=5" alt="TaniPantau" class="w-100" style="height:420px;object-fit:cover;" onerror="this.style.display='none'">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background:linear-gradient(transparent,rgba(0,0,0,0.7));">
+                        <div class="accuracy-badge p-3 rounded-3 d-inline-block shadow">
+                            <div class="fw-bold lh-1" style="font-size:2.2rem;">100%</div>
+                            <div class="small fw-semibold accuracy-label">Akurasi Data Panen</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7" data-aos="fade-left">
+                <p class="text-success fw-bold text-uppercase small mb-2 d-inline-flex align-items-center gap-2" style="letter-spacing:0.1em;">
+                    <span class="d-inline-block rounded-circle bg-success" style="width:6px;height:6px;"></span>
+                    Keunggulan Sistem
+                </p>
+                <h2 class="fw-bold mb-4 dark-heading" style="font-size:1.85rem;">Mengapa Petani Memilih TaniPantau?</h2>
+                <p class="text-muted mb-4" style="font-size:0.95rem;">Platform monitoring pertanian terintegrasi yang membantu petani dan penyuluh dalam mengelola lahan secara digital.</p>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex gap-3 p-3 rounded-3 border border-success border-opacity-10 feature-box shadow-sm transition-hover" style="cursor:default;">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 inline-primary-bg" style="width:44px;height:44px;border-radius:10px;">
+                            <span class="material-symbols-outlined" style="color:#16a34a;font-variation-settings:'FILL'1;font-size:24px;">radar</span>
+                        </div>
+                        <div><div class="fw-bold dark-heading" style="font-size:0.9rem;">Monitoring Real-Time</div><div class="text-muted small">Pantau perkembangan lahan secara langsung dari dashboard.</div></div>
+                    </div>
+                    <div class="d-flex gap-3 p-3 rounded-3 border border-success border-opacity-10 feature-box shadow-sm transition-hover" style="cursor:default;">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 inline-blue-bg" style="width:44px;height:44px;border-radius:10px;">
+                            <span class="material-symbols-outlined" style="color:#2563eb;font-size:24px;">grain</span>
+                        </div>
+                        <div><div class="fw-bold dark-heading" style="font-size:0.9rem;">Prediksi Panen Akurat</div><div class="text-muted small">Data fase tanam membantu estimasi waktu panen.</div></div>
+                    </div>
+                    <div class="d-flex gap-3 p-3 rounded-3 border border-success border-opacity-10 feature-box shadow-sm transition-hover" style="cursor:default;">
+                        <div class="d-flex align-items-center justify-content-center flex-shrink-0 inline-amber-bg" style="width:44px;height:44px;border-radius:10px;">
+                            <span class="material-symbols-outlined" style="color:#d97706;font-size:24px;">group_work</span>
+                        </div>
+                        <div><div class="fw-bold dark-heading" style="font-size:0.9rem;">Manajemen Terpadu</div><div class="text-muted small">Kelola petani dan petugas dalam satu platform.</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tentang -->
+<section id="tentang" class="pt-0" style="margin-top: -20px;">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="card p-5 h-100 border-0 shadow-sm" style="border-radius:16px;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="inline-primary-bg" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <span class="material-symbols-outlined" style="font-variation-settings:'FILL'1;font-size:24px;color:#16a34a;">eco</span>
+                        </div>
+                        <h3 class="fw-bold m-0" style="font-size:1.5rem;color:var(--heading);">Tentang TaniPantau</h3>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size:0.9375rem;line-height:1.7;">Platform monitoring lahan pertanian terpadu yang menghubungkan petugas lapangan, admin, dan masyarakat dalam satu ekosistem digital untuk mendukung produktivitas pertanian berkelanjutan.</p>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="inline-blue-bg" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-people-fill" style="color:#2563eb;font-size:1rem;"></i></div>
+                                <div><div class="fw-bold dark-heading" style="font-size:0.875rem;">Data Petani</div><div class="text-muted" style="font-size:0.75rem;">Manajemen profil dan riwayat</div></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="inline-primary-bg" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-geo-alt-fill" style="color:#16a34a;font-size:1rem;"></i></div>
+                                <div><div class="fw-bold dark-heading" style="font-size:0.875rem;">Pemetaan Lahan</div><div class="text-muted" style="font-size:0.75rem;">Lokasi dan monitoring</div></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="inline-amber-bg" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-journal-check" style="color:#d97706;font-size:1rem;"></i></div>
+                                <div><div class="fw-bold dark-heading" style="font-size:0.875rem;">Kunjungan</div><div class="text-muted" style="font-size:0.75rem;">Catatan lapangan realtime</div></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="inline-pink-bg" style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-graph-up-arrow" style="color:#db2777;font-size:1rem;"></i></div>
+                                <div><div class="fw-bold dark-heading" style="font-size:0.875rem;">Analitik</div><div class="text-muted" style="font-size:0.75rem;">Data dan statistik akurat</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="card p-5 h-100 border-0 shadow-sm" style="border-radius:16px;background:linear-gradient(135deg,#064e3b,#059669);">
+                    <div class="text-center text-white">
+                        <span class="material-symbols-outlined" style="font-size:48px;color:#86efac;">analytics</span>
+                        <h4 class="text-white fw-bold mt-3 mb-2">Monitoring Real-Time</h4>
+                        <p class="text-white/80 mb-4" style="font-size:0.875rem;">Pantau perkembangan fase lahan pertanian dengan pembaruan data langsung dari petugas lapangan.</p>
+                        <div class="d-flex justify-content-center gap-4">
+                            <div class="text-center">
+                                <div class="fw-bold text-white" style="font-size:1.5rem;" id="totalPetaniHero">0</div>
+                                <div class="text-white/70" style="font-size:0.75rem;">Petani</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="fw-bold text-white" style="font-size:1.5rem;" id="totalLahanHero">0</div>
+                                <div class="text-white/70" style="font-size:0.75rem;">Lahan</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="fw-bold text-white" style="font-size:1.5rem;" id="totalKunjunganHero">0</div>
+                                <div class="text-white/70" style="font-size:0.75rem;">Kunjungan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('totalPetaniHero').textContent = '<?= $totalPetani ?>';
+    document.getElementById('totalLahanHero').textContent = '<?= $totalLahan ?>';
+    document.getElementById('totalKunjunganHero').textContent = '<?= $totalKunjungan ?>';
+});
+</script>
 
 <section id="statistik">
     <div class="container" style="margin-top: -40px;">
@@ -123,13 +197,12 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
             </div>
             <div class="col-6 col-md-3 fade-in" style="animation-delay: 0.2s;">
                 <div class="stat-box">
-                    <div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    <div class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></div>
                     <div class="num"><?= $lahanPerluTindakan ?></div>
                     <div class="label">Perlu Tindakan</div>
                 </div>
             </div>
         </div>
-
         <div class="text-end mt-3">
             <small class="text-muted"><i class="bi bi-clock me-1"></i>Data per <?= date('d F Y H:i') ?></small>
         </div>
@@ -143,12 +216,12 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
             <?php if ($commoditiesCount): ?>
             <div class="col-md-6">
                 <div class="card p-4 h-100">
-                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2"><i class="bi bi-bar-chart-fill text-primary"></i>Komoditas</h5>
+                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2" style="color:var(--heading);"><i class="bi bi-bar-chart-fill text-primary"></i>Komoditas</h5>
                     <div class="d-flex flex-column gap-3">
                         <?php foreach (array_slice($commoditiesCount, 0, 5) as $name => $count): ?>
                         <div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span class="fw-semibold text-dark" style="font-size:0.875rem;"><?= htmlspecialchars(ucfirst($name)) ?></span>
+                                <span class="fw-semibold dark-heading" style="font-size:0.875rem;"><?= htmlspecialchars(ucfirst($name)) ?></span>
                                 <span class="text-muted" style="font-size:0.8125rem;"><?= $count ?> lahan</span>
                             </div>
                             <div class="progress-bar-custom"><div class="fill bg-primary" style="width: <?= max(5, ($count/$maxCom)*100) ?>%;"></div></div>
@@ -161,12 +234,12 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
             <?php if ($statusCount): ?>
             <div class="col-md-6">
                 <div class="card p-4 h-100">
-                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2"><i class="bi bi-pie-chart-fill text-primary"></i>Status Fase</h5>
+                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2" style="color:var(--heading);"><i class="bi bi-pie-chart-fill text-primary"></i>Status Fase</h5>
                     <div class="d-flex flex-column gap-3">
                         <?php foreach (array_slice($statusCount, 0, 5) as $name => $count): ?>
                         <div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span class="fw-semibold text-dark" style="font-size:0.875rem;"><?= htmlspecialchars($name) ?></span>
+                                <span class="fw-semibold dark-heading" style="font-size:0.875rem;"><?= htmlspecialchars($name) ?></span>
                                 <span class="text-muted" style="font-size:0.8125rem;"><?= $count ?> lahan</span>
                             </div>
                             <div class="progress-bar-custom"><div class="fill bg-info" style="width: <?= max(5, ($count/$maxSt)*100) ?>%;"></div></div>
@@ -178,208 +251,377 @@ function stLabel($s) { return match(true) { $s==='aman' => 'Aman', $s==='perlu_p
             <?php endif; ?>
         </div>
     </div>
-</section>
 <?php endif; ?>
 
-<section id="data-lahan" class="pt-0">
+<!-- Monitoring Lahan Pertanian (Peta & Daftar) -->
+<section id="lahan-monitoring" class="py-5 bg-light dark:bg-dark-bg border-top border-secondary-subtle border-opacity-10">
     <div class="container">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h3 class="fw-bold m-0 d-flex align-items-center gap-2"><i class="bi bi-view-list text-primary"></i>Daftar Lahan</h3>
-            <span class="text-muted" style="font-size:0.8125rem;"><?= $totalFiltered ?> lahan</span>
+        <div class="text-center mb-5">
+            <h2 class="fw-bold dark-heading" style="font-size:2rem;">Monitoring Lahan Pertanian</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Cari dan filter lokasi lahan pertanian di seluruh wilayah pemantauan kami secara interaktif.</p>
         </div>
 
-        <form method="GET" action="#data-lahan" class="filter-card mb-4">
-            <div class="row g-3 align-items-end">
+        <!-- Filter Panel -->
+        <div class="card p-4 border-0 shadow-sm mb-4" style="border-radius:16px;">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label text-muted fw-semibold fs-7 mb-1">Cari Lahan atau Petani</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 border-secondary-subtle">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 border-secondary-subtle fs-7" placeholder="Ketik nama lahan atau petani...">
+                    </div>
+                </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold" style="font-size:0.75rem;">CARI</label>
-                    <input type="text" class="form-control form-control-sm" name="search" placeholder="Nama lahan / petani / desa..." value="<?= htmlspecialchars($searchQuery) ?>">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-semibold" style="font-size:0.75rem;">KOMODITAS</label>
-                    <select name="komoditas" class="form-select form-select-sm">
-                        <option value="">Semua</option>
-                        <option value="padi" <?= $filterKomoditas === 'padi' ? 'selected' : '' ?>>Padi</option>
-                        <option value="jagung" <?= $filterKomoditas === 'jagung' ? 'selected' : '' ?>>Jagung</option>
-                        <option value="hortikultura" <?= $filterKomoditas === 'hortikultura' ? 'selected' : '' ?>>Hortikultura</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-semibold" style="font-size:0.75rem;">FASE</label>
-                    <select name="status_fase" class="form-select form-select-sm">
-                        <option value="">Semua</option>
-                        <option value="persiapan" <?= $filterFase === 'persiapan' ? 'selected' : '' ?>>Persiapan</option>
-                        <option value="tanam" <?= $filterFase === 'tanam' ? 'selected' : '' ?>>Tanam</option>
-                        <option value="pemeliharaan" <?= $filterFase === 'pemeliharaan' ? 'selected' : '' ?>>Pemeliharaan</option>
-                        <option value="panen" <?= $filterFase === 'panen' ? 'selected' : '' ?>>Panen</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-semibold" style="font-size:0.75rem;">KECAMATAN</label>
-                    <select name="kecamatan" class="form-select form-select-sm">
-                        <option value="">Semua</option>
+                    <label class="form-label text-muted fw-semibold fs-7 mb-1">Kecamatan</label>
+                    <select id="kecamatanSelect" class="form-select border-secondary-subtle fs-7">
+                        <option value="">Semua Kecamatan</option>
                         <?php foreach ($kecamatanList as $k): ?>
-                            <option value="<?= $k['id'] ?>" <?= $filterKecamatan == $k['id'] ? 'selected' : '' ?>><?= htmlspecialchars($k['nama']) ?></option>
+                            <option value="<?= $k['id'] ?>"><?= htmlspecialchars($k['nama']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="belum_dikunjungi" value="1" id="filterBlm" <?= $filterBelumDikunjungi === '1' ? 'checked' : '' ?>>
-                            <label class="form-check-label fw-semibold" for="filterBlm" style="font-size:0.8125rem;">Belum dikunjungi</label>
-                        </div>
-                        <button class="btn btn-primary btn-sm flex-shrink-0" type="submit"><i class="bi bi-funnel me-1"></i> Filter</button>
-                        <a href="index.php#data-lahan" class="btn btn-outline-secondary btn-sm flex-shrink-0"><i class="bi bi-x-lg"></i></a>
+                <div class="col-md-2.5 col-sm-6">
+                    <label class="form-label text-muted fw-semibold fs-7 mb-1">Komoditas</label>
+                    <select id="komoditasSelect" class="form-select border-secondary-subtle fs-7">
+                        <option value="">Semua Komoditas</option>
+                        <option value="padi">Padi</option>
+                        <option value="jagung">Jagung</option>
+                        <option value="hortikultura">Hortikultura</option>
+                    </select>
+                </div>
+                <div class="col-md-2.5 col-sm-6">
+                    <label class="form-label text-muted fw-semibold fs-7 mb-1">Status Fase</label>
+                    <select id="faseSelect" class="form-select border-secondary-subtle fs-7">
+                        <option value="">Semua Fase</option>
+                        <option value="persiapan">Persiapan</option>
+                        <option value="tanam">Tanam</option>
+                        <option value="pemeliharaan">Pemeliharaan</option>
+                        <option value="panen">Panen</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map & List Split Layout -->
+        <div class="row g-4">
+            <!-- Left Side: Interactive Map -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm overflow-hidden h-100" style="border-radius:16px; min-height: 480px;">
+                    <div id="map" style="width: 100%; height: 100%; min-height: 480px; z-index: 1;"></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Lands List -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm d-flex flex-column h-100" style="border-radius:16px; min-height: 480px;">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+                        <h5 class="fw-bold m-0 dark-heading" style="font-size:1.1rem;">
+                            Daftar Lahan (<span id="matchCount">0</span>)
+                        </h5>
+                    </div>
+                    <div class="card-body p-0 overflow-y-auto flex-grow-1" id="landsListContainer" style="max-height: 420px;">
+                        <!-- JS populated cards -->
                     </div>
                 </div>
             </div>
-        </form>
-
-        <?php if ($isSearching): ?>
-        <div class="alert alert-info border-0 d-flex align-items-center gap-2 py-2 px-4" style="border-radius:8px;font-size:0.875rem;">
-            <i class="bi bi-info-circle-fill"></i>
-            <?php if ($searchCount > 0): ?>
-                Ditemukan <strong><?= $searchCount ?></strong> data untuk "<strong><?= htmlspecialchars($searchQuery) ?></strong>".
-            <?php else: ?>
-                Tidak ditemukan data untuk "<strong><?= htmlspecialchars($searchQuery) ?></strong>".
-            <?php endif; ?>
         </div>
-        <?php endif; ?>
-
-        <?php if (empty($pagedLahan)): ?>
-            <?php if (!$isSearching): ?>
-            <div class="card p-5 text-center">
-                <i class="bi bi-inbox text-muted" style="font-size:3rem;"></i>
-                <h5 class="fw-bold mt-3">Belum ada data lahan</h5>
-                <p class="text-muted mb-0">Data lahan akan muncul setelah diinput oleh Admin atau Petugas.</p>
-            </div>
-            <?php endif; ?>
-        <?php else: ?>
-        <div class="row g-3">
-            <?php foreach ($pagedLahan as $l): ?>
-            <div class="col-md-6 col-lg-4 fade-in">
-                <div class="card-lahan h-100">
-                    <div class="body">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <?php if (!empty($l['belum_dikunjungi'])): ?>
-                                <span class="badge bg-danger" style="font-size:0.625rem;padding:2px 8px;"><i class="bi bi-exclamation-circle me-1"></i>Baru</span>
-                            <?php endif; ?>
-                            <span class="fase-badge <?= faseColor($l['status_fase'] ?? '') ?>"><?= htmlspecialchars($l['status_fase'] ?? '-') ?></span>
-                        </div>
-                        <h5 class="fw-bold mb-3" style="font-size:0.9375rem;color:#0f172a;line-height:1.3;"><?= htmlspecialchars($l['nama_lahan']) ?></h5>
-                        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px;">
-                            <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#475569;">
-                                <i class="bi bi-person-fill" style="width:14px;text-align:center;color:#94a3b8;"></i>
-                                <span><?= htmlspecialchars($l['petani']['nama'] ?? '-') ?></span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#475569;">
-                                <i class="bi bi-basket-fill" style="width:14px;text-align:center;color:#94a3b8;"></i>
-                                <span><?= htmlspecialchars(ucfirst($l['komoditas'] ?? '-')) ?></span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;font-size:0.8125rem;color:#475569;">
-                                <i class="bi bi-box" style="width:14px;text-align:center;color:#94a3b8;"></i>
-                                <span><?= htmlspecialchars($l['luas_lahan'] ?? '-') ?> Ha</span>
-                            </div>
-                        </div>
-                        <a href="detail.php?id=<?= $l['id'] ?>" class="btn btn-outline-primary w-100" style="padding:7px 12px;font-size:0.8125rem;border-radius:6px;">
-                            Detail <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-
-        <?php if ($totalPages > 1): ?>
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>#data-lahan"><i class="bi bi-chevron-left"></i></a>
-                </li>
-                <?php
-                $rangeStart = max(1, $page - 2);
-                $rangeEnd = min($totalPages, $page + 2);
-                if ($rangeStart > 1): ?>
-                <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>#data-lahan">1</a></li>
-                <?php if ($rangeStart > 2): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
-                <?php endif; ?>
-                <?php for ($i = $rangeStart; $i <= $rangeEnd; $i++): ?>
-                <li class="page-item <?= $page == $i ? 'active' : '' ?>">
-                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>#data-lahan"><?= $i ?></a>
-                </li>
-                <?php endfor; ?>
-                <?php if ($rangeEnd < $totalPages): ?>
-                <?php if ($rangeEnd < $totalPages - 1): ?><li class="page-item disabled"><span class="page-link">...</span></li><?php endif; ?>
-                <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $totalPages])) ?>#data-lahan"><?= $totalPages ?></a></li>
-                <?php endif; ?>
-                <li class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>">
-                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>#data-lahan"><i class="bi bi-chevron-right"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <?php endif; ?>
-        <?php endif; ?>
     </div>
 </section>
 
-<?php
-$kunjungan = apiGet('/kunjungan');
-$kunjungan = is_array($kunjungan) ? array_slice($kunjungan, 0, 5) : [];
-if (!empty($kunjungan)):
-?>
-<section id="kunjungan" class="pt-0">
-    <div class="container">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h3 class="fw-bold m-0 d-flex align-items-center gap-2"><i class="bi bi-clock-history text-primary"></i>Kunjungan Terbaru</h3>
-            <span class="text-muted" style="font-size:0.8125rem;"><?= count($kunjungan) ?> kunjungan</span>
+<!-- Detail Land Modal -->
+<div class="modal fade" id="landDetailModal" tabindex="-1" aria-labelledby="landDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow" style="border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold dark-heading" id="landDetailModalLabel">Detail Lahan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3" id="modalBodyContent">
+                <!-- JS populated detail content -->
+            </div>
         </div>
-        <div class="row g-3">
-            <?php
-            $kondisiIcon = ['baik'=>'bi-emoji-smile','cukup'=>'bi-emoji-neutral','buruk'=>'bi-emoji-frown'];
-            $kondisiColor = ['baik'=>'#16a34a','cukup'=>'#d97706','buruk'=>'#dc2626'];
-            ?>
-            <?php foreach ($kunjungan as $v): ?>
-            <div class="col-md-6 col-lg-4 fade-in">
-                <a href="detail.php?id=<?= $v['lahan_id'] ?>" class="text-decoration-none">
-                    <div class="card-visit h-100">
-                        <div class="d-flex align-items-start justify-content-between mb-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="visit-date">
-                                    <span class="day"><?= date('d', strtotime($v['tanggal_kunjungan'] ?? '')) ?></span>
-                                    <span class="month"><?= date('M', strtotime($v['tanggal_kunjungan'] ?? '')) ?></span>
-                                </span>
+    </div>
+</div>
+
+<style>
+    .hover-bg {
+        transition: background-color 0.2s ease-in-out;
+    }
+    .hover-bg:hover {
+        background-color: var(--primary-light) !important;
+    }
+    .fs-7 { font-size: 0.8125rem !important; }
+    .fs-8 { font-size: 0.75rem !important; }
+    [data-bs-theme="dark"] .bg-light-subtle { background-color: rgba(255, 255, 255, 0.05) !important; }
+</style>
+
+<script>
+const lands = <?= json_encode($allLahan) ?>;
+const apiBaseUrl = '<?= API_BASE_URL ?>';
+
+let map;
+let markersLayer;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Map
+    let mapCenter = [-8.5069, 115.2625]; // Ubud fallback
+    
+    // Find first valid coordinates
+    for (let l of lands) {
+        if (l.latitude && l.longitude) {
+            mapCenter = [parseFloat(l.latitude), parseFloat(l.longitude)];
+            break;
+        }
+    }
+    
+    map = L.map('map').setView(mapCenter, 12);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    
+    markersLayer = L.layerGroup().addTo(map);
+    
+    // 2. Add Event Listeners for Filters
+    document.getElementById('searchInput').addEventListener('input', filterLands);
+    document.getElementById('kecamatanSelect').addEventListener('change', filterLands);
+    document.getElementById('komoditasSelect').addEventListener('change', filterLands);
+    document.getElementById('faseSelect').addEventListener('change', filterLands);
+    
+    // Initial Filter / Load
+    filterLands();
+});
+
+function filterLands() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const kecamatan = document.getElementById('kecamatanSelect').value;
+    const komoditas = document.getElementById('komoditasSelect').value;
+    const fase = document.getElementById('faseSelect').value;
+    
+    const filtered = lands.filter(l => {
+        const matchSearch = !search || 
+            l.nama_lahan.toLowerCase().includes(search) || 
+            (l.petani && l.petani.nama.toLowerCase().includes(search));
+            
+        const matchKecamatan = !kecamatan || 
+            (l.petani && String(l.petani.kecamatan_id) === String(kecamatan));
+            
+        const matchKomoditas = !komoditas || 
+            l.komoditas.toLowerCase() === komoditas.toLowerCase();
+            
+        const matchFase = !fase || 
+            l.status_fase.toLowerCase() === fase.toLowerCase();
+            
+        return matchSearch && matchKecamatan && matchKomoditas && matchFase;
+    });
+    
+    document.getElementById('matchCount').textContent = filtered.length;
+    
+    // Update Map Markers
+    markersLayer.clearLayers();
+    
+    const bounds = [];
+    
+    // Populate List & Markers
+    const container = document.getElementById('landsListContainer');
+    container.innerHTML = '';
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-geo-alt-fill fs-2 d-block mb-2"></i>
+                Tidak ada lahan yang cocok.
+            </div>
+        `;
+        return;
+    }
+    
+    filtered.forEach(l => {
+        // Create list item card
+        const card = document.createElement('div');
+        card.className = 'p-3 border-bottom border-secondary-subtle border-opacity-10 hover-bg transition-all cursor-pointer';
+        
+        let badgeColor = 'bg-secondary';
+        if (l.status_fase === 'persiapan') badgeColor = 'bg-warning text-dark';
+        else if (l.status_fase === 'tanam') badgeColor = 'bg-info text-dark';
+        else if (l.status_fase === 'pemeliharaan') badgeColor = 'bg-success';
+        else if (l.status_fase === 'panen') badgeColor = 'bg-success';
+        
+        card.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="fw-bold m-0 dark-heading fs-7">${l.nama_lahan}</h6>
+                <span class="badge ${badgeColor} text-capitalize fs-8">${l.status_fase}</span>
+            </div>
+            <div class="text-muted fs-8 mb-2">
+                <i class="bi bi-person-fill me-1"></i>${l.petani ? l.petani.nama : '-'}
+                <span class="mx-1">•</span>
+                <i class="bi bi-geo-alt-fill me-1"></i>${l.petani && l.petani.kecamatan ? l.petani.kecamatan : '-'}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-light text-success border border-success-subtle fs-8 text-uppercase">${l.komoditas}</span>
+                <small class="text-muted fs-8"><i class="bi bi-arrows-fullscreen me-1"></i>${l.luas_lahan} Ha</small>
+            </div>
+        `;
+        
+        card.addEventListener('click', () => showLandDetail(l.id));
+        container.appendChild(card);
+        
+        // Add map marker if coords are valid
+        if (l.latitude && l.longitude) {
+            const lat = parseFloat(l.latitude);
+            const lng = parseFloat(l.longitude);
+            bounds.push([lat, lng]);
+            
+            const marker = L.marker([lat, lng]).addTo(markersLayer);
+            marker.bindPopup(`
+                <div style="font-family: 'Inter', sans-serif;">
+                    <h6 class="fw-bold mb-1">${l.nama_lahan}</h6>
+                    <p class="text-muted mb-2 fs-7">Petani: ${l.petani ? l.petani.nama : '-'}</p>
+                    <button onclick="showLandDetail(${l.id})" class="btn btn-success btn-sm w-100 rounded-pill py-1 fs-8 text-white">Lihat Detail</button>
+                </div>
+            `);
+        }
+    });
+    
+    // Fit map bounds if there are markers
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+}
+
+function showLandDetail(id) {
+    const modalElement = document.getElementById('landDetailModal');
+    let modal = bootstrap.Modal.getInstance(modalElement);
+    if (!modal) {
+        modal = new bootstrap.Modal(modalElement);
+    }
+    const contentContainer = document.getElementById('modalBodyContent');
+    
+    contentContainer.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+    modal.show();
+    
+    // Fetch details including visit history from backend API
+    fetch(`${apiBaseUrl}/lahan/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            let badgeColor = 'bg-secondary';
+            if (data.status_fase === 'persiapan') badgeColor = 'bg-warning text-dark';
+            else if (data.status_fase === 'tanam') badgeColor = 'bg-info text-dark';
+            else if (data.status_fase === 'pemeliharaan') badgeColor = 'bg-success';
+            else if (data.status_fase === 'panen') badgeColor = 'bg-success';
+            
+            let kunjunganHtml = '';
+            if (data.kunjungan_lahans && data.kunjungan_lahans.length > 0) {
+                data.kunjungan_lahans.forEach(k => {
+                    let kBadge = 'bg-success text-white';
+                    if (k.kondisi_lahan === 'cukup') kBadge = 'bg-warning text-dark';
+                    else if (k.kondisi_lahan === 'buruk') kBadge = 'bg-danger text-white';
+                    
+                    let tlBadge = 'bg-success text-white';
+                    if (k.status_tindak_lanjut === 'perlu_pemantauan') tlBadge = 'bg-warning text-dark';
+                    else if (k.status_tindak_lanjut === 'perlu_tindakan') tlBadge = 'bg-danger text-white';
+                    
+                    let imageHtml = '';
+                    if (k.foto) {
+                        let cleanFotoUrl = k.foto;
+                        if (!cleanFotoUrl.startsWith('http')) {
+                            cleanFotoUrl = `<?= BACKEND_URL ?>/${cleanFotoUrl}`;
+                        }
+                        imageHtml = `
+                            <div class="mt-2">
+                                <a href="${cleanFotoUrl}" target="_blank">
+                                    <img src="${cleanFotoUrl}" class="rounded shadow-sm" style="max-height: 120px; object-fit: cover;">
+                                </a>
+                            </div>
+                        `;
+                    }
+                    
+                    const kDate = new Date(k.tanggal_kunjungan).toLocaleDateString('id-ID', {
+                        day: 'numeric', month: 'short', year: 'numeric'
+                    });
+                    
+                    kunjunganHtml += `
+                        <div class="p-3 border border-secondary-subtle border-opacity-10 rounded-3 mb-2 bg-light bg-opacity-50">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold fs-7 text-dark">${kDate}</span>
                                 <div>
-                                    <div class="fw-bold text-dark" style="font-size:0.9375rem;"><?= htmlspecialchars($v['nama_lahan'] ?? '-') ?></div>
-                                    <div class="text-muted" style="font-size:0.75rem;"><i class="bi bi-person-fill me-1"></i><?= htmlspecialchars($v['petugas'] ?? '-') ?></div>
+                                    <span class="badge ${kBadge} text-capitalize fs-8">${k.kondisi_lahan}</span>
+                                    <span class="badge ${tlBadge} text-capitalize fs-8">${k.status_tindak_lanjut.replace('_', ' ')}</span>
                                 </div>
                             </div>
-                            <span class="badge-sm <?= stBadge(strtolower($v['status_tindak_lanjut'] ?? '')) ?>"><?= stLabel(strtolower($v['status_tindak_lanjut'] ?? '')) ?></span>
+                            <p class="mb-1 text-muted fs-7" style="line-height:1.4;">${k.catatan_lapangan || 'Tidak ada catatan.'}</p>
+                            <small class="text-muted d-block fs-8"><i class="bi bi-person me-1"></i>Petugas: ${k.petugas || 'Tidak diketahui'}</small>
+                            ${imageHtml}
                         </div>
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="kondisi-badge" style="background:<?= $kondisiColor[strtolower($v['kondisi_lahan'] ?? '')] ?? '#64748b' ?>10;color:<?= $kondisiColor[strtolower($v['kondisi_lahan'] ?? '')] ?? '#64748b' ?>;border-color:<?= $kondisiColor[strtolower($v['kondisi_lahan'] ?? '')] ?? '#64748b' ?>30;">
-                                <i class="bi <?= $kondisiIcon[strtolower($v['kondisi_lahan'] ?? '')] ?? 'bi-dash' ?> me-1"></i>
-                                <?= htmlspecialchars(ucfirst($v['kondisi_lahan'] ?? '-')) ?>
-                            </span>
-                            <?php if (!empty($v['catatan_lapangan'])): ?>
-                            <span class="text-muted" style="font-size:0.75rem;"><i class="bi bi-chat-dots me-1"></i>Ada catatan</span>
-                            <?php endif; ?>
-                            <?php if (!empty($v['foto'])): ?>
-                            <span class="text-muted" style="font-size:0.75rem;"><i class="bi bi-camera me-1"></i>Ada foto</span>
-                            <?php endif; ?>
+                    `;
+                });
+            } else {
+                kunjunganHtml = `<div class="text-center py-4 text-muted fs-7">Belum ada riwayat kunjungan.</div>`;
+            }
+            
+            contentContainer.innerHTML = `
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <div class="p-3 border border-secondary-subtle border-opacity-10 rounded-3 h-100 bg-light bg-opacity-25">
+                            <h6 class="fw-bold mb-3 dark-heading" style="font-size:0.95rem;">Informasi Lahan</h6>
+                            <table class="table table-sm table-borderless m-0 fs-7">
+                                <tr>
+                                    <td class="text-muted py-1 ps-0" width="100">Nama Lahan</td>
+                                    <td class="fw-semibold text-dark py-1 pe-0">${data.nama_lahan}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Petani</td>
+                                    <td class="fw-semibold text-dark py-1 pe-0">${data.petani ? data.petani.nama : '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Kecamatan</td>
+                                    <td class="fw-semibold text-dark py-1 pe-0">${data.petani && data.petani.kecamatan ? data.petani.kecamatan : '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Komoditas</td>
+                                    <td class="fw-semibold py-1 pe-0 text-success text-capitalize">${data.komoditas}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Luas Lahan</td>
+                                    <td class="fw-semibold text-dark py-1 pe-0">${data.luas_lahan} Ha</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Fase Tanam</td>
+                                    <td class="py-1 pe-0"><span class="badge ${badgeColor} text-capitalize">${data.status_fase}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted py-1 ps-0">Koordinat</td>
+                                    <td class="fw-semibold text-dark py-1 pe-0">${data.latitude || '-'}, ${data.longitude || '-'}</td>
+                                </tr>
+                            </table>
+                            ${data.google_maps_link ? `
+                                <a href="${data.google_maps_link}" target="_blank" class="btn btn-outline-success btn-sm w-100 mt-4 rounded-pill">
+                                    <i class="bi bi-map me-1"></i> Buka Google Maps
+                                </a>
+                            ` : ''}
                         </div>
-                        <?php if (!empty($v['catatan_lapangan'])): ?>
-                        <div class="visit-note"><?= htmlspecialchars($v['catatan_lapangan']) ?></div>
-                        <?php endif; ?>
                     </div>
-                </a>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="text-center mt-4">
-            <a href="index.php#data-lahan" class="btn btn-soft btn-sm"><i class="bi bi-arrow-right me-1"></i> Lihat Semua Lahan</a>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
+                    <div class="col-md-7">
+                        <h6 class="fw-bold mb-3 dark-heading" style="font-size:0.95rem;">Riwayat Kunjungan Petugas</h6>
+                        <div class="overflow-y-auto pe-1" style="max-height: 280px;">
+                            ${kunjunganHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(err => {
+            contentContainer.innerHTML = `<div class="text-danger py-4 text-center">Gagal memuat detail lahan.</div>`;
+        });
+}
+</script>
 
 <?php require_once 'includes/footer.php'; ?>

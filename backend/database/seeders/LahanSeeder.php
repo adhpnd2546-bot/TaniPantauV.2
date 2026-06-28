@@ -3,12 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\Lahan;
+use App\Models\Petani;
 use Illuminate\Database\Seeder;
 
 class LahanSeeder extends Seeder
 {
     public function run(): void
     {
+        $petaniMap = Petani::pluck('petugas_id', 'id');
+
         $lahan = [
             ['petani_id' => 1, 'nama_lahan' => 'Blok A1 - Sawah Irigasi', 'komoditas' => 'padi', 'luas_lahan' => 2.5, 'latitude' => -7.56840000, 'longitude' => 112.75890000, 'tanggal_tanam' => '2024-10-01', 'status_fase' => 'tanam'],
             ['petani_id' => 2, 'nama_lahan' => 'Blok B2 - Tani Jaya', 'komoditas' => 'jagung', 'luas_lahan' => 1.8, 'latitude' => -7.57210000, 'longitude' => 112.76230000, 'tanggal_tanam' => '2024-09-15', 'status_fase' => 'pemeliharaan'],
@@ -21,6 +24,7 @@ class LahanSeeder extends Seeder
         ];
 
         foreach ($lahan as $data) {
+            $data['petugas_id'] = $petaniMap[$data['petani_id']] ?? null;
             Lahan::create($data);
         }
     }
