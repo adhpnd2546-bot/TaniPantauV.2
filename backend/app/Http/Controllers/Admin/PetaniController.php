@@ -53,8 +53,8 @@ class PetaniController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_petani' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|unique:petani,nik',
+            'nama_petani' => 'required|string|max:255|regex:/^[\pL\s\-\.\']+$/u',
+            'nik' => 'required|digits:16|unique:petani,nik',
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',
@@ -88,8 +88,8 @@ class PetaniController extends Controller
         $petani = Petani::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_petani' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|unique:petani,nik,' . $id,
+            'nama_petani' => 'required|string|max:255|regex:/^[\pL\s\-\.\']+$/u',
+            'nik' => 'required|digits:16|unique:petani,nik,' . $id,
             'alamat' => 'required|string',
             'kecamatan_id' => 'required|exists:kecamatan,id',
             'desa_id' => 'required|exists:desa,id',

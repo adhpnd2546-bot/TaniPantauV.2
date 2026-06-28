@@ -364,6 +364,13 @@ const apiBaseUrl = '<?= API_BASE_URL ?>';
 let map;
 let markersLayer;
 
+function loadDetail(url) {
+    return fetch(url).then(res => {
+        if (!res.ok) throw new Error('Response not OK');
+        return res.json();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Map
     let mapCenter = [-8.5069, 115.2625]; // Ubud fallback
@@ -402,17 +409,17 @@ function filterLands() {
     
     const filtered = lands.filter(l => {
         const matchSearch = !search || 
-            l.nama_lahan.toLowerCase().includes(search) || 
-            (l.petani && l.petani.nama.toLowerCase().includes(search));
+            (l.nama_lahan && l.nama_lahan.toLowerCase().includes(search)) || 
+            (l.petani && l.petani.nama && l.petani.nama.toLowerCase().includes(search));
             
         const matchKecamatan = !kecamatan || 
             (l.petani && String(l.petani.kecamatan_id) === String(kecamatan));
             
         const matchKomoditas = !komoditas || 
-            l.komoditas.toLowerCase() === komoditas.toLowerCase();
+            (l.komoditas && l.komoditas.toLowerCase() === komoditas.toLowerCase());
             
         const matchFase = !fase || 
-            l.status_fase.toLowerCase() === fase.toLowerCase();
+            (l.status_fase && l.status_fase.toLowerCase() === fase.toLowerCase());
             
         return matchSearch && matchKecamatan && matchKomoditas && matchFase;
     });
@@ -451,8 +458,8 @@ function filterLands() {
         
         card.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-1">
-                <h6 class="fw-bold m-0 dark-heading fs-7">${l.nama_lahan}</h6>
-                <span class="badge ${badgeColor} text-capitalize fs-8">${l.status_fase}</span>
+                <h6 class="fw-bold m-0 dark-heading fs-7">${l.nama_lahan || '-'}</h6>
+                <span class="badge ${badgeColor} text-capitalize fs-8">${l.status_fase || '-'}</span>
             </div>
             <div class="text-muted fs-8 mb-2">
                 <i class="bi bi-person-fill me-1"></i>${l.petani ? l.petani.nama : '-'}
@@ -460,8 +467,8 @@ function filterLands() {
                 <i class="bi bi-geo-alt-fill me-1"></i>${l.petani && l.petani.kecamatan ? l.petani.kecamatan : '-'}
             </div>
             <div class="d-flex justify-content-between align-items-center">
-                <span class="badge bg-light text-success border border-success-subtle fs-8 text-uppercase">${l.komoditas}</span>
-                <small class="text-muted fs-8"><i class="bi bi-arrows-fullscreen me-1"></i>${l.luas_lahan} Ha</small>
+                <span class="badge bg-light text-success border border-success-subtle fs-8 text-uppercase">${l.komoditas || '-'}</span>
+                <small class="text-muted fs-8"><i class="bi bi-arrows-fullscreen me-1"></i>${l.luas_lahan ?? '-'} Ha</small>
             </div>
         `;
         
@@ -477,7 +484,7 @@ function filterLands() {
             const marker = L.marker([lat, lng]).addTo(markersLayer);
             marker.bindPopup(`
                 <div style="font-family: 'Inter', sans-serif;">
-                    <h6 class="fw-bold mb-1">${l.nama_lahan}</h6>
+                    <h6 class="fw-bold mb-1">${l.nama_lahan || '-'}</h6>
                     <p class="text-muted mb-2 fs-7">Petani: ${l.petani ? l.petani.nama : '-'}</p>
                     <button onclick="showLandDetail(${l.id})" class="btn btn-success btn-sm w-100 rounded-pill py-1 fs-8 text-white">Lihat Detail</button>
                 </div>
@@ -508,10 +515,11 @@ function showLandDetail(id) {
     `;
     modal.show();
     
-    // Fetch details including visit history from backend API
-    fetch(`${apiBaseUrl}/lahan/${id}`)
-        .then(res => res.json())
-        .then(data => {
+    // Fetch details via proxy (same-origin, no CORS), fallback ke API langsung
+    loadDetail(`api-proxy.php?endpoint=/lahan/${id}`)
+        .catch(() => loadDetail(`${apiBaseUrl}/lahan/${id}`))
+        .then(res => {
+            const data = res.data || res;
             let badgeColor = 'bg-secondary';
             if (data.status_fase === 'persiapan') badgeColor = 'bg-warning text-dark';
             else if (data.status_fase === 'tanam') badgeColor = 'bg-info text-dark';

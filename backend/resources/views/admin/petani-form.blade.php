@@ -21,13 +21,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex flex-col">
                 <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="nama_petani">Nama Petani <span class="text-danger">*</span></label>
-                <input type="text" id="nama_petani" name="nama_petani" value="{{ old('nama_petani', $petani->nama_petani ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card @error('nama_petani') border-danger @enderror" required>
+                <input type="text" id="nama_petani" name="nama_petani" value="{{ old('nama_petani', $petani->nama_petani ?? '') }}" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card @error('nama_petani') border-danger @enderror" pattern="[A-Za-z\s\-\.']+" title="Hanya boleh huruf, spasi, tanda hubung, dan petik" required>
                 @error('nama_petani') <small class="text-danger mt-1">{{ $message }}</small> @enderror
             </div>
 
             <div class="flex flex-col">
                 <label class="text-[13px] font-medium text-heading dark:text-dark-heading mb-1.5" for="nik">NIK <span class="text-danger">*</span></label>
-                <input type="text" id="nik" name="nik" value="{{ old('nik', $petani->nik ?? '') }}" maxlength="16" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card @error('nik') border-danger @enderror" required>
+                <input type="text" id="nik" name="nik" value="{{ old('nik', $petani->nik ?? '') }}" maxlength="16" class="w-full border border-border dark:border-dark-border rounded-[0.375rem] px-3 py-2 text-[15px] text-heading dark:text-dark-heading focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all bg-white dark:bg-dark-card @error('nik') border-danger @enderror" pattern="[0-9]{16}" title="NIK harus 16 digit angka" inputmode="numeric" required>
                 @error('nik') <small class="text-danger mt-1">{{ $message }}</small> @enderror
             </div>
 

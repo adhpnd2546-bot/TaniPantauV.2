@@ -110,27 +110,34 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const defaultLat = {{ old('latitude', $lahan->latitude ?? -7.56000000) }};
-        const defaultLng = {{ old('longitude', $lahan->longitude ?? 112.75000000) }};
+    (function() {
+        var defaultLat = parseFloat('{{ old('latitude', $lahan->latitude ?? -7.56000000) }}') || -7.56000000;
+        var defaultLng = parseFloat('{{ old('longitude', $lahan->longitude ?? 112.75000000) }}') || 112.75000000;
 
-        const map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
+        var map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        let marker = null;
-        if (defaultLat && defaultLng) {
-            marker = L.marker([defaultLat, defaultLng]).addTo(map);
-        }
+        var marker = null;
+
+        map.whenReady(function() {
+            if (defaultLat && defaultLng) {
+                marker = L.marker([defaultLat, defaultLng]).addTo(map);
+            }
+        });
 
         map.on('click', function(e) {
-            const lat = e.latlng.lat.toFixed(6);
-            const lng = e.latlng.lng.toFixed(6);
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
 
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
+            var latInput = document.getElementById('latitude');
+            var lngInput = document.getElementById('longitude');
+            latInput.value = lat;
+            lngInput.value = lng;
+            latInput.dispatchEvent(new Event('input'));
+            lngInput.dispatchEvent(new Event('input'));
 
             if (marker) {
                 marker.setLatLng(e.latlng);
@@ -140,18 +147,18 @@
         });
 
         // Auto-fill petugas_id when petani changes
-        const petaniSelect = document.getElementById('petani_id');
-        const petugasSelect = document.getElementById('petugas_id');
+        var petaniSelect = document.getElementById('petani_id');
+        var petugasSelect = document.getElementById('petugas_id');
         if (petaniSelect && petugasSelect) {
             petaniSelect.addEventListener('change', function() {
-                const selected = petaniSelect.options[petaniSelect.selectedIndex];
-                const petugasId = selected ? selected.getAttribute('data-petugas') : '';
+                var selected = petaniSelect.options[petaniSelect.selectedIndex];
+                var petugasId = selected ? selected.getAttribute('data-petugas') : '';
                 if (petugasId && !petugasSelect.value) {
                     petugasSelect.value = petugasId;
                 }
             });
         }
-    });
+    })();
 </script>
 @endpush
 

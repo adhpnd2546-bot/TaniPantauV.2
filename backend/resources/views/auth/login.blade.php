@@ -173,7 +173,7 @@
         
         <div class="w-full max-w-[360px] mx-auto">
             <!-- Back Link -->
-            <a class="inline-flex items-center gap-2 text-[13px] font-medium text-gray-400 dark:text-dark-muted hover:text-gray-900 dark:hover:text-dark-heading transition-colors mb-12" href="/">
+            <a class="inline-flex items-center gap-2 text-[13px] font-medium text-gray-400 dark:text-dark-muted hover:text-gray-900 dark:hover:text-dark-heading transition-colors mb-12" href="{{ config('app.frontend_url') }}">
                 <span class="material-symbols-outlined text-[16px]">arrow_back</span>
                 Kembali
             </a>
